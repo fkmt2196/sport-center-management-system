@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SportCenter.Domain\SportCenter.Domain.csproj" />
+    <ProjectReference Include="..\SportCenter.DAL\SportCenter.DAL.csproj" />
+  </ItemGroup>
+</Project>

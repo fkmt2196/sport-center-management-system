@@ -1,0 +1,82 @@
+# Build output
+**/[Bb]in/
+**/[Oo]bj/
+[Aa]rtifacts/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+*.log
+*.binlog
+
+# Visual Studio / MSBuild: per-user state
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.sln.ide
+*.csproj.user
+*.pubxml.user
+*.publishsettings
+
+# Rider / ReSharper / VS Code: local workspace state
+.idea/
+_ReSharper*/
+*.DotSettings.user
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Test results / coverage
+TestResults/
+**/TestResults/
+coverage/
+coverage.*
+*.coverage
+*.coveragexml
+
+# NuGet restore output (keep packages.lock.json if added later)
+**/packages/
+*.nupkg
+*.snupkg
+
+# Local configuration / credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+**/appsettings.Local.json
+**/appsettings.*.Local.json
+**/appsettings.Development.json
+!**/appsettings.Development.example.json
+**/secrets.json
+*.pfx
+*.p12
+
+# Local database files / backups (commit SQL scripts instead)
+*.mdf
+*.ldf
+*.ndf
+*.bak
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.sqlite3-journal
+
+# OS / temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.swp
+*~
