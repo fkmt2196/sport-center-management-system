@@ -1,45 +1,10 @@
 <Window x:Class="SportCenter.Wpf.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="{Binding Title}"
-        Width="960" Height="620"
-        MinWidth="680" MinHeight="480"
-        WindowStartupLocation="CenterScreen"
-        Background="{StaticResource BackgroundBrush}"
-        Foreground="{StaticResource TextBrush}"
-        FontFamily="Segoe UI"
-        FontSize="15">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Margin="40">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <StackPanel>
-                <TextBlock Text="{Binding Title}" FontSize="30" FontWeight="SemiBold"
-                           Foreground="{StaticResource PrimaryBrush}" TextWrapping="Wrap" />
-                <TextBlock Text="{Binding Description}" Margin="0,8,0,0" FontSize="18"
-                           Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" />
-            </StackPanel>
-
-            <Border Grid.Row="1" Margin="0,28,0,0" Padding="24"
-                    Background="{StaticResource SurfaceBrush}" CornerRadius="12">
-                <StackPanel>
-                    <TextBlock Text="Các module dự kiến" FontSize="19" FontWeight="SemiBold" />
-                    <ItemsControl ItemsSource="{Binding PlannedModules}" Margin="0,12,0,0">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" Margin="0,6" TextWrapping="Wrap" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Border>
-
-            <TextBlock Grid.Row="2" Text="{Binding Status}" Margin="0,24,0,0"
-                       Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" />
-        </Grid>
-    </ScrollViewer>
+        xmlns:members="clr-namespace:SportCenter.Wpf.Views.Members"
+        Title="Sport Center · Học viên" Width="1440" Height="920"
+        MinWidth="1060" MinHeight="720" WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI" FontSize="14" Language="vi-VN"
+        Background="{StaticResource BackgroundBrush}">
+    <members:MemberDashboardView />
 </Window>

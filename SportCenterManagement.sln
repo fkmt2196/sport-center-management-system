@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -13,6 +13,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportCenter.BLL", "backend\SportCenter.BLL\SportCenter.BLL.csproj", "{688EC8F0-5EC8-4335-873B-23BD208B12AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportCenter.DAL", "backend\SportCenter.DAL\SportCenter.DAL.csproj", "{2CA24A75-B2D7-440A-9F0C-2529848C690F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{40CC08E8-7F4D-4F25-8936-826369C7D9C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportCenter.MemberModule.Tests", "tests\SportCenter.MemberModule.Tests\SportCenter.MemberModule.Tests.csproj", "{F29C6C00-8024-4469-BFFA-70A2682DBD92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +40,10 @@ Global
 		{2CA24A75-B2D7-440A-9F0C-2529848C690F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CA24A75-B2D7-440A-9F0C-2529848C690F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CA24A75-B2D7-440A-9F0C-2529848C690F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F29C6C00-8024-4469-BFFA-70A2682DBD92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F29C6C00-8024-4469-BFFA-70A2682DBD92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F29C6C00-8024-4469-BFFA-70A2682DBD92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F29C6C00-8024-4469-BFFA-70A2682DBD92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -45,5 +53,6 @@ Global
 		{C920849B-FFDB-4221-BCCF-DA27D0EAEB27} = {7A53A26B-BF0F-48C4-B338-5AA91A019481}
 		{688EC8F0-5EC8-4335-873B-23BD208B12AE} = {7A53A26B-BF0F-48C4-B338-5AA91A019481}
 		{2CA24A75-B2D7-440A-9F0C-2529848C690F} = {7A53A26B-BF0F-48C4-B338-5AA91A019481}
+		{F29C6C00-8024-4469-BFFA-70A2682DBD92} = {40CC08E8-7F4D-4F25-8936-826369C7D9C2}
 	EndGlobalSection
 EndGlobal

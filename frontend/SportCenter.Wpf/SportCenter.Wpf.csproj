@@ -9,5 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\backend\SportCenter.BLL\SportCenter.BLL.csproj" />
     <ProjectReference Include="..\..\backend\SportCenter.Domain\SportCenter.Domain.csproj" />
+    <ProjectReference Include="..\..\backend\SportCenter.DAL\SportCenter.DAL.csproj" />
   </ItemGroup>
 </Project>
