@@ -203,9 +203,10 @@ internal static class Program
         Check(vm.HasSelectedClass, "Card command did not reach the dashboard.");
         Render(root, 1060, 720, renderDirectory, "class-details");
         var closeButton = Descendants<Button>(view).First(button => Equals(button.Content, "Đóng"));
-        Check(closeButton.Foreground is SolidColorBrush { Color: var foreground } && foreground == Colors.White,
-            "Primary button foreground must contrast with its green background.");
-        Check(Descendants<TextBlock>(closeButton).All(text => text.Foreground is SolidColorBrush brush && brush.Color == Colors.White),
+        var primaryInk = view.FindResource("TrackInk");
+        Check(Equals(closeButton.Foreground, primaryInk) && Equals(closeButton.Background, view.FindResource("TrackLime")),
+            "Primary button must use the high-contrast foreground and accent pair.");
+        Check(Descendants<TextBlock>(closeButton).All(text => Equals(text.Foreground, primaryInk)),
             "Button label did not inherit its foreground.");
         vm.CloseClassCommand.Execute(null);
         foreach (var tab in new[] { "history", "progress", "profile" })
@@ -216,7 +217,7 @@ internal static class Program
         vm.NavigateCommand.Execute("history");
         Render(root, 1060, 720, null, "nav-check");
         var nav = Descendants<Button>(view).First(button => Equals(button.Content, "Lịch sử tập luyện"));
-        Check(Equals(nav.Background, app.FindResource("PrimaryLightBrush")), "Active navigation styling failed.");
+        Check(Equals(nav.Background, view.FindResource("TrackSelection")), "Active navigation styling failed.");
         Check(trace.Errors.Count == 0, "WPF binding errors: " + string.Join(Environment.NewLine, trace.Errors));
         app.Shutdown();
     }

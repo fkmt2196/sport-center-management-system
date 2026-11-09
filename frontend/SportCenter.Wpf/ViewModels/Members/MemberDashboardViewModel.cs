@@ -62,7 +62,7 @@ public sealed class MemberDashboardViewModel : ViewModelBase, IDisposable
     public string MemberName => _data?.Profile.FullName ?? "Học viên";
     public string MemberInitial => MemberName.Split(' ', StringSplitOptions.RemoveEmptyEntries).LastOrDefault()?[..1] ?? "M";
     public string MemberCode => $"HV{_session.MemberId:0000}";
-    public string Greeting => $"Chào {MemberName.Split(' ').Last()}, sẵn sàng tập luyện?";
+    public string Greeting => $"Vào nhịp, {MemberName.Split(' ', StringSplitOptions.RemoveEmptyEntries).LastOrDefault() ?? "bạn"}!";
     public string TodayLabel => _clock.GetLocalNow().ToString("dddd, dd 'tháng' MM, yyyy", CultureInfo.GetCultureInfo("vi-VN"));
     public string Email => _data?.Profile.Email ?? "—";
     public string Phone => _data?.Profile.Phone ?? "—";

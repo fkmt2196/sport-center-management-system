@@ -19,7 +19,7 @@ chỉ đọc và chưa kết nối SQL Server.
 
 ## Chức năng
 
-- Lịch theo tuần dạng card; tìm theo lớp, bộ môn, HLV hoặc phòng; lọc bộ môn và
+- Lịch theo tuần dạng bảng lịch thi đấu; tìm theo lớp, bộ môn, HLV hoặc phòng; lọc bộ môn và
   lớp đã đăng ký; xem thông tin chi tiết lớp, HLV, phòng, thời gian và số chỗ.
 - Lịch sử điểm danh có lọc trạng thái và nhận xét của Coach. Tỷ lệ có mặt không
   tính buổi nghỉ có phép; tổng giờ tập chỉ tính buổi có mặt.
@@ -57,6 +57,9 @@ App tham chiếu DAL chỉ để khởi tạo dependency; View và ViewModel g�
 `App.xaml` nạp `Colors.xaml` trước `Controls.xaml` trong `Resources/Styles`.
 Các màn hình khác dùng được ngay các style mặc định cho Button, TextBox, ComboBox,
 CheckBox, DataGrid và ProgressBar.
+
+`MemberDashboardView` nạp riêng `MemberTrack.xaml` để dùng nền than, điểm nhấn
+xanh chanh và các control cùng tông. Các style này chỉ áp dụng trong khu vực học viên.
 
 Các key tái sử dụng: `PrimaryButtonStyle`, `SecondaryButtonStyle`,
 `NavigationButtonStyle`, `SurfaceStyle`, `SectionTitleStyle`, `MutedTextStyle`

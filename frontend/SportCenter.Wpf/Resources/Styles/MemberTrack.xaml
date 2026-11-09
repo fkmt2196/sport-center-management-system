@@ -1,0 +1,330 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="TrackCanvas" Color="#141714" />
+    <SolidColorBrush x:Key="TrackPanel" Color="#1C201C" />
+    <SolidColorBrush x:Key="TrackRaised" Color="#252B24" />
+    <SolidColorBrush x:Key="TrackLine" Color="#394139" />
+    <SolidColorBrush x:Key="TrackText" Color="#F5F6EF" />
+    <SolidColorBrush x:Key="TrackMuted" Color="#AFBAAD" />
+    <SolidColorBrush x:Key="TrackLime" Color="#D5F86A" />
+    <SolidColorBrush x:Key="TrackInk" Color="#1C2314" />
+    <SolidColorBrush x:Key="TrackSelection" Color="#303C24" />
+    <SolidColorBrush x:Key="TrackAmber" Color="#F5C578" />
+    <SolidColorBrush x:Key="TrackError" Color="#FFB5AA" />
+    <LinearGradientBrush x:Key="TrackHero" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#2C3526" Offset="0" />
+        <GradientStop Color="#1C221C" Offset="1" />
+    </LinearGradientBrush>
+
+    <FontFamily x:Key="TrackMono">Consolas</FontFamily>
+    <Style x:Key="TrackMutedText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TrackMuted}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style x:Key="TrackLabel" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource TrackMono}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{StaticResource TrackMuted}" />
+    </Style>
+    <Style x:Key="TrackScore" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource TrackMono}" />
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Margin" Value="0,2,0,0" />
+    </Style>
+    <Style x:Key="TrackBox" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource TrackPanel}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TrackLine}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="20" />
+    </Style>
+    <Style x:Key="TrackScoreCell" TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource TrackLine}" />
+        <Setter Property="BorderThickness" Value="0,0,1,0" />
+        <Setter Property="Padding" Value="22,13" />
+    </Style>
+    <Style x:Key="TrackScheduleRow" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource TrackPanel}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TrackLine}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource TrackRaised}" />
+                <Setter Property="BorderBrush" Value="{StaticResource TrackMuted}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TrackButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource TrackRaised}" />
+        <Setter Property="Foreground" Value="{StaticResource TrackText}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TrackLine}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Padding" Value="12,7" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Chrome" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="Center" RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource TrackLime}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Chrome" Property="Opacity" Value="0.8" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Chrome" Property="BorderBrush" Value="{StaticResource TrackLime}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Chrome" Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="Button" BasedOn="{StaticResource TrackButton}" />
+    <Style x:Key="TrackPrimaryButton" TargetType="Button" BasedOn="{StaticResource TrackButton}">
+        <Setter Property="Background" Value="{StaticResource TrackLime}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TrackLime}" />
+        <Setter Property="Foreground" Value="{StaticResource TrackInk}" />
+    </Style>
+    <Style x:Key="TrackTab" TargetType="Button" BasedOn="{StaticResource TrackButton}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
+        <Setter Property="Foreground" Value="{StaticResource TrackMuted}" />
+        <Setter Property="Padding" Value="13,9" />
+        <Setter Property="FontSize" Value="13" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
+                <Setter Property="Background" Value="{StaticResource TrackSelection}" />
+                <Setter Property="BorderBrush" Value="{StaticResource TrackLime}" />
+                <Setter Property="Foreground" Value="{StaticResource TrackLime}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource TrackCanvas}" />
+        <Setter Property="Foreground" Value="{StaticResource TrackText}" />
+        <Setter Property="CaretBrush" Value="{StaticResource TrackLime}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TrackLine}" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource TrackLime}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource TrackText}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel Orientation="Horizontal" Background="Transparent">
+                        <Border x:Name="Box" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,8,0"
+                                BorderThickness="1" BorderBrush="{StaticResource TrackMuted}" Background="{StaticResource TrackCanvas}">
+                            <Path x:Name="Check" Data="M 2,6 L 5,9 L 11,3" Stroke="{StaticResource TrackInk}" StrokeThickness="1.6"
+                                  VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed" />
+                        </Border>
+                        <ContentPresenter VerticalAlignment="Center" RecognizesAccessKey="True" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Box" Property="Background" Value="{StaticResource TrackLime}" />
+                            <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource TrackLime}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{StaticResource TrackText}" />
+        <Setter Property="Background" Value="{StaticResource TrackCanvas}" />
+        <Setter Property="BorderBrush" Value="{StaticResource TrackLine}" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <ToggleButton x:Name="Toggle" Focusable="False" Cursor="Hand"
+                                      IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border x:Name="ToggleChrome" Background="{StaticResource TrackCanvas}"
+                                            BorderBrush="{StaticResource TrackLine}" BorderThickness="1">
+                                        <Path Data="M 0,0 L 4,4 L 8,0" Stroke="{StaticResource TrackMuted}" StrokeThickness="1.5"
+                                              HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,13,0" />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="ToggleChrome" Property="BorderBrush" Value="{StaticResource TrackLime}" />
+                                        </Trigger>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter TargetName="ToggleChrome" Property="BorderBrush" Value="{StaticResource TrackLime}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <ContentPresenter IsHitTestVisible="False" VerticalAlignment="Center" Margin="10,0,30,0"
+                                          Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
+                        <Border x:Name="FocusRing" BorderBrush="{StaticResource TrackLime}" BorderThickness="1" IsHitTestVisible="False" Visibility="Collapsed" />
+                        <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" Focusable="False" AllowsTransparency="True">
+                            <Border MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                    Background="{StaticResource TrackPanel}" BorderBrush="{StaticResource TrackLine}" BorderThickness="1" Padding="3">
+                                <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="FocusRing" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="Foreground" Value="{StaticResource TrackText}" />
+        <Setter Property="Background" Value="{StaticResource TrackPanel}" />
+        <Setter Property="Padding" Value="9,8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter Property="Background" Value="{StaticResource TrackSelection}" />
+                <Setter Property="Foreground" Value="{StaticResource TrackLime}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <ControlTemplate x:Key="TrackScrollPage" TargetType="RepeatButton">
+        <Border Background="Transparent" />
+    </ControlTemplate>
+    <Style TargetType="ScrollBar">
+        <Setter Property="Width" Value="10" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid Background="{StaticResource TrackCanvas}">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton x:Name="Decrease" Focusable="False" Command="{x:Static ScrollBar.PageUpCommand}"
+                                              Template="{StaticResource TrackScrollPage}" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb>
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Border Margin="2" Background="{StaticResource TrackLine}" CornerRadius="2" />
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton x:Name="Increase" Focusable="False" Command="{x:Static ScrollBar.PageDownCommand}"
+                                              Template="{StaticResource TrackScrollPage}" />
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Orientation" Value="Horizontal">
+                            <Setter TargetName="PART_Track" Property="IsDirectionReversed" Value="False" />
+                            <Setter TargetName="Decrease" Property="Command" Value="{x:Static ScrollBar.PageLeftCommand}" />
+                            <Setter TargetName="Increase" Property="Command" Value="{x:Static ScrollBar.PageRightCommand}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="Width" Value="Auto" />
+                <Setter Property="Height" Value="10" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="DataGrid">
+        <Setter Property="AutoGenerateColumns" Value="False" />
+        <Setter Property="Foreground" Value="{StaticResource TrackText}" />
+        <Setter Property="Background" Value="{StaticResource TrackPanel}" />
+        <Setter Property="RowBackground" Value="{StaticResource TrackPanel}" />
+        <Setter Property="AlternatingRowBackground" Value="{StaticResource TrackRaised}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+        <Setter Property="GridLinesVisibility" Value="None" />
+        <Setter Property="RowHeight" Value="46" />
+        <Setter Property="ColumnHeaderHeight" Value="38" />
+        <Setter Property="SelectionMode" Value="Single" />
+    </Style>
+    <Style TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="{StaticResource TrackRaised}" />
+        <Setter Property="Foreground" Value="{StaticResource TrackMuted}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="10,8" />
+    </Style>
+    <Style TargetType="DataGridCell">
+        <Setter Property="Foreground" Value="{StaticResource TrackText}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource TrackSelection}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="DataGridRow">
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource TrackSelection}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="ProgressBar">
+        <Setter Property="Height" Value="6" />
+        <Setter Property="Maximum" Value="100" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="{StaticResource TrackLine}" />
+        <Setter Property="Foreground" Value="{StaticResource TrackLime}" />
+    </Style>
+</ResourceDictionary>

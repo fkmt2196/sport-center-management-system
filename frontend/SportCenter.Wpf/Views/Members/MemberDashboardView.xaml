@@ -2,247 +2,313 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:members="clr-namespace:SportCenter.Wpf.Views.Members"
-             x:Name="DashboardRoot" Foreground="{StaticResource TextBrush}">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="224" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Border Background="White" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0" Padding="20,30">
-            <DockPanel LastChildFill="True">
-                <StackPanel DockPanel.Dock="Top" Margin="12,0,0,36">
-                    <TextBlock Text="SPORT / CENTER" FontSize="19" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" />
-                    <TextBlock Text="KHÔNG GIAN HỌC VIÊN" FontSize="10" Margin="0,8,0,0" Style="{StaticResource MutedTextStyle}" />
-                </StackPanel>
-                <StackPanel DockPanel.Dock="Bottom">
-                    <Border Background="{StaticResource PrimaryLightBrush}" CornerRadius="10" Padding="14" Margin="0,0,0,20">
-                        <StackPanel>
-                            <TextBlock Text="Mỗi buổi tập là một bước tiến." FontWeight="SemiBold" TextWrapping="Wrap" />
-                            <TextBlock Text="Duy trì đều đặn, tiến bộ mỗi ngày." Margin="0,8,0,0" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                        </StackPanel>
+             Background="{DynamicResource TrackCanvas}" Foreground="{DynamicResource TrackText}"
+             UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Resources/Styles/MemberTrack.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="{StaticResource TrackCanvas}">
+        <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+        <Border Background="{StaticResource TrackPanel}" BorderBrush="{StaticResource TrackLine}" BorderThickness="0,0,0,1">
+            <Grid MaxWidth="1360" Margin="32,0" MinHeight="68">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <Border Width="32" Height="32" Background="{StaticResource TrackLime}" Margin="0,0,11,0">
+                        <Path Data="M 2,14 L 10,0 L 15,0 L 7,14 Z M 11,14 L 19,0 L 24,0 L 16,14 Z"
+                              Fill="{StaticResource TrackInk}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
-                    <TextBlock Text="{Binding MemberName}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                    <TextBlock Text="{Binding MemberCode}" Margin="0,5,0,0" FontSize="12" Style="{StaticResource MutedTextStyle}" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="SPORT/CENTER" FontSize="16" FontWeight="Bold" />
+                        <TextBlock Text="KHU VỰC HỌC VIÊN" Style="{StaticResource TrackLabel}" FontSize="10" Margin="0,2,0,0" />
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel>
-                    <Button Content="Lịch học" Style="{StaticResource NavigationButtonStyle}" Tag="{Binding IsScheduleTab}"
-                            Command="{Binding NavigateCommand}" CommandParameter="schedule" />
-                    <Button Content="Lịch sử tập luyện" Style="{StaticResource NavigationButtonStyle}" Tag="{Binding IsHistoryTab}"
-                            Command="{Binding NavigateCommand}" CommandParameter="history" />
-                    <Button Content="Tiến độ của bạn" Style="{StaticResource NavigationButtonStyle}" Tag="{Binding IsProgressTab}"
-                            Command="{Binding NavigateCommand}" CommandParameter="progress" />
-                    <Button Content="Gói tập &amp; hồ sơ" Style="{StaticResource NavigationButtonStyle}" Tag="{Binding IsProfileTab}"
-                            Command="{Binding NavigateCommand}" CommandParameter="profile" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button Content="Lịch học" Style="{StaticResource TrackTab}" Tag="{Binding IsScheduleTab}"
+                            Command="{Binding NavigateCommand}" CommandParameter="schedule" Click="OnNavigate" />
+                    <Button Content="Lịch sử tập luyện" Style="{StaticResource TrackTab}" Tag="{Binding IsHistoryTab}"
+                            Command="{Binding NavigateCommand}" CommandParameter="history" Click="OnNavigate" />
+                    <Button Content="Tiến độ của bạn" Style="{StaticResource TrackTab}" Tag="{Binding IsProgressTab}"
+                            Command="{Binding NavigateCommand}" CommandParameter="progress" Click="OnNavigate" />
+                    <Button Content="Gói tập &amp; hồ sơ" Style="{StaticResource TrackTab}" Tag="{Binding IsProfileTab}"
+                            Command="{Binding NavigateCommand}" CommandParameter="profile" Click="OnNavigate" />
                 </StackPanel>
-            </DockPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0,0,0">
+                    <Border Background="{StaticResource TrackSelection}" Width="32" Height="32" Margin="0,0,10,0">
+                        <TextBlock Text="{Binding MemberInitial}" Foreground="{StaticResource TrackLime}" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding MemberName}" FontWeight="SemiBold" FontSize="13" MaxWidth="145" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding MemberCode}" Style="{StaticResource TrackLabel}" FontSize="11" Margin="0,2,0,0" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <DockPanel Grid.Column="1" Margin="32,26,24,20">
-            <StackPanel DockPanel.Dock="Top" Margin="0,0,8,22">
-                <TextBlock Text="{Binding TodayLabel}" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                <TextBlock Text="{Binding Greeting}" FontSize="23" FontWeight="SemiBold" Margin="0,8,12,0" TextWrapping="Wrap" />
-            </StackPanel>
-            <StackPanel DockPanel.Dock="Top">
-                <ProgressBar IsIndeterminate="True" Height="3" Margin="0,0,8,12"
-                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
-                <Border Background="{StaticResource DangerLightBrush}" Padding="16" CornerRadius="8" Margin="0,0,8,16"
+        <ScrollViewer x:Name="DashboardScroll" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel MaxWidth="1360" Margin="32,24,32,32">
+                <ProgressBar IsIndeterminate="True" Height="3" Margin="0,0,0,12" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+                <Border Background="#362620" BorderBrush="{StaticResource TrackError}" BorderThickness="2,0,0,0" Padding="16" Margin="0,0,0,16"
                         Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}">
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Content="Thử lại" Command="{Binding RefreshCommand}" Margin="16,0,0,0" />
-                        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" Foreground="{StaticResource DangerBrush}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource TrackError}" TextWrapping="Wrap" VerticalAlignment="Center" />
                     </DockPanel>
                 </Border>
-            </StackPanel>
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,4,0">
-                <StackPanel>
-                    <WrapPanel Margin="0,0,0,20">
-                        <Border Style="{StaticResource SurfaceStyle}" Padding="18" Width="174" Margin="0,0,12,12">
-                            <StackPanel><TextBlock Text="Lớp đã đặt / tuần" Style="{StaticResource MutedTextStyle}" FontSize="12" />
-                                <TextBlock Text="{Binding RegisteredCount}" FontSize="30" FontWeight="SemiBold" Margin="0,8,0,0" /></StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource SurfaceStyle}" Padding="18" Width="174" Margin="0,0,12,12">
-                            <StackPanel><TextBlock Text="Buổi đã tham gia" Style="{StaticResource MutedTextStyle}" FontSize="12" />
-                                <TextBlock Text="{Binding AttendedCount}" FontSize="30" FontWeight="SemiBold" Margin="0,8,0,0" /></StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource SurfaceStyle}" Padding="18" Width="174" Margin="0,0,12,12">
-                            <StackPanel><TextBlock Text="Tỷ lệ có mặt" Style="{StaticResource MutedTextStyle}" FontSize="12" />
-                                <TextBlock Text="{Binding AttendanceRateLabel}" FontSize="30" FontWeight="SemiBold" Margin="0,8,0,0" /></StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource SurfaceStyle}" Padding="18" Width="174" Margin="0,0,12,12">
-                            <StackPanel><TextBlock Text="Lượt tập còn lại" Style="{StaticResource MutedTextStyle}" FontSize="12" />
-                                <TextBlock Text="{Binding RemainingSessions}" FontSize="30" FontWeight="SemiBold" Margin="0,8,0,0"
-                                           Foreground="{StaticResource PrimaryBrush}" /></StackPanel>
-                        </Border>
-                    </WrapPanel>
-                    <DockPanel Margin="0,0,8,20">
-                        <Button DockPanel.Dock="Right" Content="Làm mới" Command="{Binding RefreshCommand}" />
-                        <TextBlock Text="{Binding PageTitle}" Style="{StaticResource SectionTitleStyle}" VerticalAlignment="Center" />
-                    </DockPanel>
 
-                    <!-- Schedule: reusable nested class cards; registration data belongs to the booking module. -->
-                    <StackPanel Visibility="{Binding IsScheduleTab, Converter={StaticResource BoolToVisibility}}">
-                        <Border Style="{StaticResource SurfaceStyle}" Padding="18" Margin="0,0,8,20">
-                            <StackPanel>
-                                <DockPanel Margin="0,0,0,16">
-                                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
-                                        <Button Content="‹" ToolTip="Tuần trước" AutomationProperties.Name="Tuần trước"
-                                                Command="{Binding PreviousWeekCommand}" Margin="6,0,0,0" />
-                                        <Button Content="Tuần này" Command="{Binding CurrentWeekCommand}" Margin="6,0,0,0" />
-                                        <Button Content="›" ToolTip="Tuần sau" AutomationProperties.Name="Tuần sau"
-                                                Command="{Binding NextWeekCommand}" Margin="6,0,0,0" />
-                                    </StackPanel>
-                                    <TextBlock Text="{Binding WeekLabel}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                </DockPanel>
-                                <Grid>
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="180" /></Grid.ColumnDefinitions>
-                                    <StackPanel Margin="0,0,12,0">
-                                        <TextBlock Text="Tìm lớp, HLV hoặc phòng" FontSize="12" Margin="0,0,0,6" Style="{StaticResource MutedTextStyle}" />
-                                        <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Tìm lớp học" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="1">
-                                        <TextBlock Text="Bộ môn" FontSize="12" Margin="0,0,0,6" Style="{StaticResource MutedTextStyle}" />
-                                        <ComboBox ItemsSource="{Binding Sports}" SelectedItem="{Binding SelectedSport}" AutomationProperties.Name="Lọc bộ môn" />
-                                    </StackPanel>
-                                </Grid>
-                                <DockPanel Margin="0,14,0,0">
-                                    <TextBlock DockPanel.Dock="Right" Text="{Binding ClassCountLabel}" FontSize="12" Style="{StaticResource MutedTextStyle}" VerticalAlignment="Center" />
-                                    <CheckBox Content="Chỉ hiện lớp đã đăng ký" IsChecked="{Binding RegisteredOnly}" />
-                                </DockPanel>
+                <Border BorderThickness="1" BorderBrush="{StaticResource TrackLine}" Margin="0,0,0,24"
+                        Visibility="{Binding IsScheduleTab, Converter={StaticResource BoolToVisibility}}">
+                    <StackPanel>
+                        <Grid Background="{StaticResource TrackHero}" MinHeight="145" ClipToBounds="True">
+                            <Canvas Width="500" Height="160" HorizontalAlignment="Right" VerticalAlignment="Center" IsHitTestVisible="False">
+                                <Path Data="M 75,162 L 220,0 M 98,162 L 243,0 M 120,162 L 265,0" Stroke="#3E5132" StrokeThickness="1" />
+                                <Path Data="M 146,146 L 416,146 L 525,21 L 255,21 Z M 281,146 L 390,21 M 206,77 L 476,77 M 168,121 L 242,121 L 307,46 L 234,46 M 440,121 L 366,121 L 431,46 L 505,46"
+                                      Stroke="#51673F" StrokeThickness="1" />
+                                <Path Data="M 363,77 C 351,99 311,108 296,98 C 286,89 306,68 327,61 C 350,53 373,60 363,77 Z"
+                                      Stroke="#51673F" StrokeThickness="1" />
+                                <Path Data="M 461,138 L 519,72 M 474,138 L 532,72" Stroke="{StaticResource TrackLime}" StrokeThickness="2" Opacity="0.6" />
+                            </Canvas>
+                            <StackPanel Margin="26,19,24,20" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Fill="{StaticResource TrackLime}" Width="16" Height="3" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                    <TextBlock Text="{Binding TodayLabel}" Style="{StaticResource TrackLabel}" Foreground="{StaticResource TrackLime}" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding Greeting}" FontSize="42" FontWeight="Bold" Margin="0,4,0,2" TextWrapping="Wrap" />
+                                <TextBlock Text="Chọn buổi tập phù hợp với lịch của bạn." Foreground="{StaticResource TrackMuted}" />
                             </StackPanel>
-                        </Border>
-                        <ItemsControl ItemsSource="{Binding Classes}">
-                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate><DataTemplate><members:ClassCard /></DataTemplate></ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <Border Style="{StaticResource SurfaceStyle}" Margin="0,0,8,16"
-                                Visibility="{Binding IsScheduleEmpty, Converter={StaticResource BoolToVisibility}}">
-                            <StackPanel>
-                                <TextBlock Text="Chưa có lớp phù hợp" FontSize="19" FontWeight="SemiBold" />
-                                <TextBlock Text="Thử đổi tuần hoặc bỏ bớt điều kiện tìm kiếm." Margin="0,8,0,16" Style="{StaticResource MutedTextStyle}" />
-                                <Button Content="Xóa bộ lọc" Command="{Binding ClearFiltersCommand}" HorizontalAlignment="Left" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-
-                    <StackPanel Visibility="{Binding IsHistoryTab, Converter={StaticResource BoolToVisibility}}" Margin="0,0,8,0">
-                        <Border Style="{StaticResource SurfaceStyle}">
-                            <StackPanel>
-                                <DockPanel Margin="0,0,0,20">
-                                    <ComboBox DockPanel.Dock="Right" Width="180" ItemsSource="{Binding AttendanceFilters}"
-                                              SelectedItem="{Binding AttendanceFilter}" AutomationProperties.Name="Lọc điểm danh" />
+                        </Grid>
+                        <Border Background="{StaticResource TrackPanel}" BorderBrush="{StaticResource TrackLine}" BorderThickness="0,1,0,0">
+                            <UniformGrid Columns="4">
+                                <Border Style="{StaticResource TrackScoreCell}">
                                     <StackPanel>
-                                        <TextBlock Text="Nhìn lại hành trình của bạn" FontSize="18" FontWeight="SemiBold" />
-                                        <TextBlock Text="{Binding TrainingHoursLabel, StringFormat=Tổng thời gian có mặt: {0} giờ}"
-                                                   Margin="0,6,12,0" Style="{StaticResource MutedTextStyle}" />
-                                    </StackPanel>
-                                </DockPanel>
-                                <DataGrid x:Name="AttendanceGrid" ItemsSource="{Binding Attendance}" MaxHeight="480" MinHeight="100" SelectedIndex="0"
-                                          IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Ngày &amp; giờ" Binding="{Binding DateLabel}" Width="1.3*" MinWidth="148" />
-                                        <DataGridTextColumn Header="Lớp học" Binding="{Binding Record.ClassName}" Width="1.5*" MinWidth="165" ElementStyle="{StaticResource GridCellTextStyle}" />
-                                        <DataGridTextColumn Header="Huấn luyện viên" Binding="{Binding Record.CoachName}" Width="1.4*" MinWidth="153" ElementStyle="{StaticResource GridCellTextStyle}" />
-                                        <DataGridTextColumn Header="Thời lượng" Binding="{Binding DurationLabel}" Width="90" />
-                                        <DataGridTextColumn Header="Điểm danh" Binding="{Binding StatusLabel}" Width="100" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <TextBlock Text="Chưa có lịch sử phù hợp với bộ lọc." Margin="0,16,0,0" Style="{StaticResource MutedTextStyle}"
-                                           Visibility="{Binding IsAttendanceEmpty, Converter={StaticResource BoolToVisibility}}" />
-                                <Border Background="{StaticResource BackgroundBrush}" Padding="16" CornerRadius="8" Margin="0,20,0,0">
-                                    <StackPanel>
-                                        <TextBlock Text="Nhận xét của huấn luyện viên" FontWeight="SemiBold" />
-                                        <TextBlock Text="{Binding SelectedItem.Record.CoachComment, ElementName=AttendanceGrid, TargetNullValue=Chọn một buổi tập để xem nhận xét.}"
-                                                   TextWrapping="Wrap" Margin="0,8,0,0" Style="{StaticResource MutedTextStyle}" />
+                                        <TextBlock Text="LỚP ĐÃ ĐẶT / TUẦN" Style="{StaticResource TrackLabel}" />
+                                        <TextBlock Text="{Binding RegisteredCount, StringFormat={}{0:00}}" Style="{StaticResource TrackScore}" />
                                     </StackPanel>
                                 </Border>
-                                <TextBlock Text="Tỷ lệ có mặt được tính trên các buổi có mặt và vắng mặt; không tính buổi nghỉ có phép."
-                                           FontSize="12" Margin="0,16,0,0" Style="{StaticResource MutedTextStyle}" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-
-                    <StackPanel Visibility="{Binding IsProgressTab, Converter={StaticResource BoolToVisibility}}">
-                        <TextBlock Text="Các chỉ số gần nhất và mục tiêu do huấn luyện viên ghi nhận."
-                                   Margin="0,0,8,20" Style="{StaticResource MutedTextStyle}" />
-                        <ItemsControl ItemsSource="{Binding Progress}">
-                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Style="{StaticResource SurfaceStyle}" Width="296" Margin="0,0,16,16">
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Record.MetricName}" FontSize="19" FontWeight="SemiBold" />
-                                            <TextBlock Text="{Binding CurrentLabel}" FontSize="32" FontWeight="SemiBold" Margin="0,16,0,8" Foreground="{StaticResource PrimaryBrush}" />
-                                            <TextBlock Text="{Binding GoalLabel}" Style="{StaticResource MutedTextStyle}" />
-                                            <ProgressBar Value="{Binding CompletionPercent, Mode=OneWay}" Margin="0,20,0,8" />
-                                            <TextBlock Text="{Binding PercentLabel}" FontSize="12" />
-                                            <TextBlock Text="{Binding BaselineLabel}" FontSize="12" Margin="0,12,0,6" Style="{StaticResource MutedTextStyle}" />
-                                            <TextBlock Text="{Binding UpdatedLabel}" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                                            <TextBlock Text="{Binding Record.CoachComment}" Margin="0,18,0,0" Style="{StaticResource MutedTextStyle}" />
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <Border Style="{StaticResource SurfaceStyle}" Margin="0,0,8,0"
-                                Visibility="{Binding IsProgressEmpty, Converter={StaticResource BoolToVisibility}}">
-                            <TextBlock Text="Chưa có đánh giá tiến độ. Chỉ số sẽ xuất hiện khi Coach cập nhật kết quả tập luyện."
-                                       Style="{StaticResource MutedTextStyle}" />
-                        </Border>
-                    </StackPanel>
-
-                    <Grid Visibility="{Binding IsProfileTab, Converter={StaticResource BoolToVisibility}}" Margin="0,0,8,0">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                        <Border Style="{StaticResource SurfaceStyle}" Margin="0,0,16,0" VerticalAlignment="Top">
-                            <StackPanel>
-                                <TextBlock Text="GÓI TẬP HIỆN TẠI" FontSize="11" Style="{StaticResource MutedTextStyle}" />
-                                <TextBlock Text="{Binding PlanName}" FontSize="30" FontWeight="SemiBold" Margin="0,12,0,14" TextWrapping="Wrap" />
-                                <Border Background="{StaticResource PrimaryLightBrush}" CornerRadius="5" Padding="10,6" HorizontalAlignment="Left">
-                                    <TextBlock Text="{Binding MembershipStatus}" Foreground="{StaticResource PrimaryBrush}" FontWeight="SemiBold" />
+                                <Border Style="{StaticResource TrackScoreCell}">
+                                    <StackPanel>
+                                        <TextBlock Text="BUỔI ĐÃ THAM GIA" Style="{StaticResource TrackLabel}" />
+                                        <TextBlock Text="{Binding AttendedCount, StringFormat={}{0:00}}" Style="{StaticResource TrackScore}" />
+                                    </StackPanel>
                                 </Border>
-                                <TextBlock Text="{Binding MembershipDescription}" Margin="0,20,0,18" Style="{StaticResource MutedTextStyle}" />
-                                <TextBlock Text="{Binding MembershipUsageLabel}" TextWrapping="Wrap" />
-                                <ProgressBar Value="{Binding MembershipUsagePercent, Mode=OneWay}" Margin="0,12,0,20" />
-                                <TextBlock Text="{Binding MembershipPeriod}" FontWeight="SemiBold" TextWrapping="Wrap" />
-                                <TextBlock Text="{Binding MembershipExpiryLabel}" Margin="0,8,0,0" Style="{StaticResource MutedTextStyle}" />
-                                <TextBlock Text="Liên hệ quầy tiếp tân để được hỗ trợ gia hạn hoặc đổi gói tập."
-                                           Margin="0,24,0,0" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                            </StackPanel>
+                                <Border Style="{StaticResource TrackScoreCell}">
+                                    <StackPanel>
+                                        <TextBlock Text="TỶ LỆ CÓ MẶT" Style="{StaticResource TrackLabel}" />
+                                        <TextBlock Text="{Binding AttendanceRateLabel}" Style="{StaticResource TrackScore}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource TrackScoreCell}" BorderThickness="0">
+                                    <StackPanel>
+                                        <TextBlock Text="LƯỢT TẬP CÒN LẠI" Style="{StaticResource TrackLabel}" />
+                                        <TextBlock Text="{Binding RemainingSessions, StringFormat={}{0:00}}" Style="{StaticResource TrackScore}" Foreground="{StaticResource TrackLime}" />
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
                         </Border>
-                        <Border Grid.Column="1" Style="{StaticResource SurfaceStyle}" VerticalAlignment="Top">
-                            <StackPanel>
-                                <TextBlock Text="Thông tin học viên" FontSize="19" FontWeight="SemiBold" Margin="0,0,0,24" />
-                                <TextBlock Text="Họ và tên" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                                <TextBlock Text="{Binding MemberName}" Margin="0,6,0,18" FontWeight="SemiBold" TextWrapping="Wrap" />
-                                <TextBlock Text="Mã học viên" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                                <TextBlock Text="{Binding MemberCode}" Margin="0,6,0,18" />
-                                <TextBlock Text="Email" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                                <TextBlock Text="{Binding Email}" Margin="0,6,0,18" TextWrapping="Wrap" />
-                                <TextBlock Text="Số điện thoại" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                                <TextBlock Text="{Binding Phone}" Margin="0,6,0,18" />
-                                <TextBlock Text="Ngày tham gia" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                                <TextBlock Text="{Binding JoinedLabel}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <DockPanel Margin="0,0,0,14">
+                    <Button DockPanel.Dock="Right" Content="Làm mới" Command="{Binding RefreshCommand}" MinWidth="90" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding PageTitle}" FontSize="28" FontWeight="Bold" VerticalAlignment="Center" />
+                </DockPanel>
+
+                <StackPanel Visibility="{Binding IsScheduleTab, Converter={StaticResource BoolToVisibility}}">
+                    <Border Style="{StaticResource TrackBox}" Padding="15,11">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="160" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="TUẦN HỌC" Style="{StaticResource TrackLabel}" Margin="0,0,0,5" />
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="‹" Width="34" ToolTip="Tuần trước" AutomationProperties.Name="Tuần trước"
+                                            Command="{Binding PreviousWeekCommand}" Padding="0" />
+                                    <TextBlock Text="{Binding WeekLabel}" FontFamily="{StaticResource TrackMono}" FontSize="13"
+                                               Margin="10,0" VerticalAlignment="Center" />
+                                    <Button Content="›" Width="34" ToolTip="Tuần sau" AutomationProperties.Name="Tuần sau"
+                                            Command="{Binding NextWeekCommand}" Padding="0" />
+                                    <Button Content="Tuần này" Command="{Binding CurrentWeekCommand}" Margin="6,0,0,0" />
+                                </StackPanel>
                             </StackPanel>
-                        </Border>
+                            <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                                <TextBlock Text="TÌM LỚP, HLV HOẶC PHÒNG" Style="{StaticResource TrackLabel}" Margin="0,0,0,5" />
+                                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="Tìm lớp học" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="BỘ MÔN" Style="{StaticResource TrackLabel}" Margin="0,0,0,5" />
+                                <ComboBox ItemsSource="{Binding Sports}" SelectedItem="{Binding SelectedSport}" AutomationProperties.Name="Lọc bộ môn" />
+                            </StackPanel>
+                            <CheckBox Grid.Column="3" Margin="15,19,0,0" Content="Lớp đã đăng ký" IsChecked="{Binding RegisteredOnly}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                    <Grid Margin="0,12,0,7">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="148" /><ColumnDefinition Width="*" /><ColumnDefinition Width="202" />
+                            <ColumnDefinition Width="158" /><ColumnDefinition Width="132" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="GIỜ TẬP" Style="{StaticResource TrackLabel}" Margin="14,0,0,0" />
+                        <TextBlock Grid.Column="1" Text="LỚP HỌC" Style="{StaticResource TrackLabel}" Margin="14,0,0,0" />
+                        <TextBlock Grid.Column="2" Text="HLV / PHÒNG" Style="{StaticResource TrackLabel}" Margin="12,0,0,0" />
+                        <TextBlock Grid.Column="3" Text="TÌNH TRẠNG" Style="{StaticResource TrackLabel}" Margin="12,0,0,0" />
+                        <TextBlock Grid.Column="4" Text="{Binding ClassCountLabel}" Style="{StaticResource TrackLabel}" HorizontalAlignment="Right" Margin="0,0,3,0" />
                     </Grid>
+                    <ItemsControl ItemsSource="{Binding Classes}">
+                        <ItemsControl.ItemTemplate><DataTemplate><members:ClassCard /></DataTemplate></ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Border Style="{StaticResource TrackBox}" Visibility="{Binding IsScheduleEmpty, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel>
+                            <TextBlock Text="Chưa có lớp phù hợp" FontSize="20" FontWeight="SemiBold" />
+                            <TextBlock Text="Thử đổi tuần hoặc bỏ bớt điều kiện tìm kiếm." Margin="0,8,0,16" Style="{StaticResource TrackMutedText}" />
+                            <Button Content="Xóa bộ lọc" Command="{Binding ClearFiltersCommand}" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
-            </ScrollViewer>
-        </DockPanel>
 
-        <Border Grid.ColumnSpan="2" Background="#660D241C" Padding="80,40"
-                Visibility="{Binding HasSelectedClass, Converter={StaticResource BoolToVisibility}}">
-            <Border Style="{StaticResource SurfaceStyle}" MaxWidth="500" VerticalAlignment="Center" HorizontalAlignment="Stretch" Padding="32">
+                <Grid Visibility="{Binding IsHistoryTab, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="250" /></Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource TrackBox}" Padding="14" Margin="0,0,16,0" VerticalAlignment="Top">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,13">
+                                <ComboBox DockPanel.Dock="Right" Width="172" ItemsSource="{Binding AttendanceFilters}"
+                                          SelectedItem="{Binding AttendanceFilter}" AutomationProperties.Name="Lọc điểm danh" />
+                                <TextBlock Text="ĐIỂM DANH THEO BUỔI" Style="{StaticResource TrackLabel}" VerticalAlignment="Center" />
+                            </DockPanel>
+                            <DataGrid x:Name="AttendanceGrid" ItemsSource="{Binding Attendance}" MaxHeight="430" MinHeight="100" SelectedIndex="0"
+                                      IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Ngày &amp; giờ" Binding="{Binding DateLabel}" Width="1.2*" MinWidth="132" />
+                                    <DataGridTextColumn Header="Lớp học" Binding="{Binding Record.ClassName}" Width="1.5*" MinWidth="130" ElementStyle="{StaticResource GridCellTextStyle}" />
+                                    <DataGridTextColumn Header="HLV" Binding="{Binding Record.CoachName}" Width="1.3*" MinWidth="122" ElementStyle="{StaticResource GridCellTextStyle}" />
+                                    <DataGridTextColumn Header="Thời lượng" Binding="{Binding DurationLabel}" Width="86" />
+                                    <DataGridTextColumn Header="Điểm danh" Binding="{Binding StatusLabel}" Width="94" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <TextBlock Text="Chưa có lịch sử phù hợp với bộ lọc." Margin="0,12,0,0" Style="{StaticResource TrackMutedText}"
+                                       Visibility="{Binding IsAttendanceEmpty, Converter={StaticResource BoolToVisibility}}" />
+                        </StackPanel>
+                    </Border>
+                    <StackPanel Grid.Column="1">
+                        <Border Style="{StaticResource TrackBox}" Background="{StaticResource TrackSelection}" BorderThickness="0" Padding="18">
+                            <StackPanel>
+                                <TextBlock Text="TỔNG GIỜ TẬP" Style="{StaticResource TrackLabel}" />
+                                <TextBlock Text="{Binding TrainingHoursLabel, StringFormat={}{0} giờ}" Style="{StaticResource TrackScore}" Foreground="{StaticResource TrackLime}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource TrackBox}" BorderBrush="{StaticResource TrackAmber}" BorderThickness="2,0,0,0" Margin="0,12,0,0" Padding="18">
+                            <StackPanel>
+                                <TextBlock Text="NHẬN XÉT CỦA HLV" Style="{StaticResource TrackLabel}" Foreground="{StaticResource TrackAmber}" />
+                                <TextBlock Text="{Binding SelectedItem.Record.CoachComment, ElementName=AttendanceGrid, FallbackValue='Chọn một buổi tập để xem nhận xét.', TargetNullValue='Chọn một buổi tập để xem nhận xét.'}"
+                                           TextWrapping="Wrap" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+                        <TextBlock Text="Tỷ lệ có mặt không tính buổi nghỉ có phép." Margin="0,12,0,0" FontSize="12" Style="{StaticResource TrackMutedText}" />
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel Visibility="{Binding IsProgressTab, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Text="Kết quả gần nhất và mục tiêu do huấn luyện viên ghi nhận." Margin="0,0,0,18" Style="{StaticResource TrackMutedText}" />
+                    <ItemsControl ItemsSource="{Binding Progress}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource TrackBox}" Padding="0" Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="1.05*" /><ColumnDefinition Width="1.2*" /><ColumnDefinition Width="1.1*" /></Grid.ColumnDefinitions>
+                                        <StackPanel Margin="20,16" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Record.MetricName}" FontSize="19" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding CurrentLabel}" Style="{StaticResource TrackScore}" Foreground="{StaticResource TrackLime}" />
+                                            <TextBlock Text="{Binding UpdatedLabel}" Style="{StaticResource TrackLabel}" Margin="0,6,0,0" />
+                                        </StackPanel>
+                                        <Border Grid.Column="1" Padding="20,16" BorderBrush="{StaticResource TrackLine}" BorderThickness="1,0,1,0">
+                                            <StackPanel VerticalAlignment="Center">
+                                                <DockPanel>
+                                                    <TextBlock DockPanel.Dock="Right" Text="{Binding PercentLabel}" Style="{StaticResource TrackLabel}" Foreground="{StaticResource TrackLime}" />
+                                                    <TextBlock Text="{Binding GoalLabel}" Style="{StaticResource TrackMutedText}" />
+                                                </DockPanel>
+                                                <ProgressBar Value="{Binding CompletionPercent, Mode=OneWay}" Margin="0,12,0,8" />
+                                                <TextBlock Text="{Binding BaselineLabel}" Style="{StaticResource TrackLabel}" />
+                                            </StackPanel>
+                                        </Border>
+                                        <StackPanel Grid.Column="2" Margin="20,16" VerticalAlignment="Center">
+                                            <TextBlock Text="NHẬN XÉT CỦA HLV" Style="{StaticResource TrackLabel}" Foreground="{StaticResource TrackAmber}" />
+                                            <TextBlock Text="{Binding Record.CoachComment}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Border Style="{StaticResource TrackBox}" Visibility="{Binding IsProgressEmpty, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock Text="Chưa có đánh giá tiến độ. Chỉ số sẽ xuất hiện khi HLV cập nhật kết quả tập luyện." Style="{StaticResource TrackMutedText}" />
+                    </Border>
+                </StackPanel>
+
+                <Grid Visibility="{Binding IsProfileTab, Converter={StaticResource BoolToVisibility}}">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="1.1*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource TrackBox}" Padding="0" Margin="0,0,16,0" VerticalAlignment="Top">
+                        <StackPanel>
+                            <Grid Background="{StaticResource TrackLime}" ClipToBounds="True">
+                                <Path Data="M 0,152 L 126,0 M 19,152 L 145,0 M 38,152 L 164,0 M 57,152 L 183,0"
+                                      Stroke="{StaticResource TrackInk}" StrokeThickness="1" Opacity="0.22"
+                                      HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <StackPanel Margin="22,17" HorizontalAlignment="Left">
+                                    <TextBlock Text="GÓI TẬP HIỆN TẠI" Style="{StaticResource TrackLabel}" Foreground="{StaticResource TrackInk}" />
+                                    <TextBlock Text="{Binding PlanName}" FontSize="34" FontWeight="Bold" Foreground="{StaticResource TrackInk}" TextWrapping="Wrap" Margin="0,2,0,8" />
+                                    <Border Background="{StaticResource TrackInk}" Padding="8,4" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding MembershipStatus}" Foreground="{StaticResource TrackLime}" FontWeight="SemiBold" FontSize="12" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel Margin="22,18,22,22">
+                                <TextBlock Text="{Binding MembershipDescription}" Style="{StaticResource TrackMutedText}" Margin="0,0,0,16" />
+                                <TextBlock Text="{Binding MembershipUsageLabel}" TextWrapping="Wrap" FontWeight="SemiBold" />
+                                <ProgressBar Value="{Binding MembershipUsagePercent, Mode=OneWay}" Margin="0,9,0,16" />
+                                <TextBlock Text="{Binding MembershipPeriod}" Style="{StaticResource TrackLabel}" Foreground="{StaticResource TrackText}" />
+                                <TextBlock Text="{Binding MembershipExpiryLabel}" Margin="0,5,0,0" Style="{StaticResource TrackMutedText}" />
+                                <TextBlock Text="Liên hệ quầy tiếp tân để gia hạn hoặc đổi gói tập." Margin="0,15,0,0" FontSize="12" Style="{StaticResource TrackMutedText}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource TrackBox}" VerticalAlignment="Top">
+                        <StackPanel>
+                            <TextBlock Text="THÔNG TIN HỌC VIÊN" Style="{StaticResource TrackLabel}" Foreground="{StaticResource TrackLime}" />
+                            <TextBlock Text="{Binding MemberName}" FontSize="26" FontWeight="Bold" TextWrapping="Wrap" Margin="0,5,0,2" />
+                            <TextBlock Text="{Binding MemberCode}" Style="{StaticResource TrackLabel}" />
+                            <Border BorderBrush="{StaticResource TrackLine}" BorderThickness="0,1,0,0" Margin="0,16,0,0" Padding="0,13,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="EMAIL" Style="{StaticResource TrackLabel}" />
+                                    <TextBlock Text="{Binding Email}" Margin="0,3,0,13" TextWrapping="Wrap" />
+                                    <TextBlock Text="SỐ ĐIỆN THOẠI" Style="{StaticResource TrackLabel}" />
+                                    <TextBlock Text="{Binding Phone}" Margin="0,3,0,13" />
+                                    <TextBlock Text="NGÀY THAM GIA" Style="{StaticResource TrackLabel}" />
+                                    <TextBlock Text="{Binding JoinedLabel}" Margin="0,3,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.RowSpan="2" Background="#BE080B08" Padding="60,32" Visibility="{Binding HasSelectedClass, Converter={StaticResource BoolToVisibility}}">
+            <Border Style="{StaticResource TrackBox}" MaxWidth="520" VerticalAlignment="Center" Padding="0">
                 <StackPanel>
-                    <TextBlock Text="CHI TIẾT BUỔI TẬP" FontSize="11" Foreground="{StaticResource PrimaryBrush}" />
-                    <TextBlock Text="{Binding SelectedClass.Session.Name}" FontSize="27" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,12,0,18" />
-                    <TextBlock Text="{Binding SelectedClass.DayLabel}" FontSize="17" />
-                    <TextBlock Text="{Binding SelectedClass.TimeLabel}" FontSize="22" FontWeight="SemiBold" Margin="0,8,0,20" />
-                    <TextBlock Text="{Binding SelectedClass.Session.Coach.FullName, StringFormat=Huấn luyện viên: {0}}" Margin="0,0,0,8" TextWrapping="Wrap" />
-                    <TextBlock Text="{Binding SelectedClass.Session.Room.Name, StringFormat=Phòng tập: {0}}" Margin="0,0,0,8" />
-                    <TextBlock Text="{Binding SelectedClass.CapacityLabel}" Margin="0,0,0,8" />
-                    <TextBlock Text="{Binding SelectedClass.StatusLabel}" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}" />
-                    <TextBlock Text="Đăng ký và hủy chỗ sẽ được kết nối với chức năng đặt lịch khi trung tâm mở đăng ký trực tuyến."
-                               Margin="0,24,0,24" Style="{StaticResource MutedTextStyle}" />
-                    <Button Content="Đóng" Command="{Binding CloseClassCommand}" Style="{StaticResource PrimaryButtonStyle}" HorizontalContentAlignment="Center" />
+                    <Border Background="{StaticResource TrackLime}" Padding="24,11">
+                        <TextBlock Text="CHI TIẾT BUỔI TẬP" Style="{StaticResource TrackLabel}" Foreground="{StaticResource TrackInk}" FontWeight="Bold" />
+                    </Border>
+                    <StackPanel Margin="24,18,24,23">
+                        <TextBlock Text="{Binding SelectedClass.Session.Name}" FontSize="28" FontWeight="Bold" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding SelectedClass.DayLabel}" Style="{StaticResource TrackLabel}" Margin="0,9,0,3" />
+                        <TextBlock Text="{Binding SelectedClass.TimeLabel}" FontFamily="{StaticResource TrackMono}" FontSize="25" Foreground="{StaticResource TrackLime}" Margin="0,0,0,16" />
+                        <TextBlock Text="{Binding SelectedClass.Session.Coach.FullName, StringFormat=Huấn luyện viên: {0}}" Margin="0,0,0,6" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding SelectedClass.Session.Room.Name, StringFormat=Phòng tập: {0}}" Margin="0,0,0,6" />
+                        <TextBlock Text="{Binding SelectedClass.CapacityLabel}" Margin="0,0,0,6" />
+                        <TextBlock Text="{Binding SelectedClass.StatusLabel}" FontWeight="SemiBold" Foreground="{StaticResource TrackLime}" />
+                        <TextBlock Text="Hiện chưa thể đặt hoặc hủy chỗ trực tuyến." Margin="0,16,0,16" Style="{StaticResource TrackMutedText}" />
+                        <Button Content="Đóng" Command="{Binding CloseClassCommand}" Style="{StaticResource TrackPrimaryButton}" />
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Border>
