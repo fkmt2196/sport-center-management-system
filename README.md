@@ -2,7 +2,7 @@ Sport Center Management System
 
 Ứng dụng WPF .NET 8, tách `frontend/`, `backend/` và script dữ liệu trong `db/`.
 
-Nhánh `duong` triển khai Member Dashboard và bộ style chung. Chạy thử với dữ liệu mẫu:
+Nhánh `duong` triển khai Member Dashboard và bộ style chung. Chạy ứng dụng:
 
 ```powershell
 dotnet run --project frontend/SportCenter.Wpf/SportCenter.Wpf.csproj

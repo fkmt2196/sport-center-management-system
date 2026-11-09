@@ -5,7 +5,7 @@ Giai đoạn dựng khung chưa chọn hệ quản trị database và chưa cầ
 
 - `scripts/`: script tạo schema hoặc thay đổi schema; nên đặt tên có thứ tự,
   ví dụ `001_initial_schema.sql`.
-- `seeds/`: dữ liệu mẫu phục vụ phát triển và demo, không dùng dữ liệu cá nhân thật.
+- `seeds/`: dữ liệu khởi tạo phục vụ phát triển, không dùng dữ liệu cá nhân thật.
 
 Nếu dùng EF Core Migrations sau này, đặt migration trong `SportCenter.DAL` và ghi
 lệnh cập nhật database vào tài liệu này. Chọn một quy trình quản lý schema thống

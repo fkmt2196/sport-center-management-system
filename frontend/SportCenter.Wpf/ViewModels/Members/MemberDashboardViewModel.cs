@@ -59,7 +59,6 @@ public sealed class MemberDashboardViewModel : ViewModelBase, IDisposable
     public RelayCommand ClearFiltersCommand { get; }
 
     private DateOnly Today => DateOnly.FromDateTime(_clock.GetLocalNow().DateTime);
-    public bool IsDemo => _session.IsDemo;
     public string MemberName => _data?.Profile.FullName ?? "Học viên";
     public string MemberInitial => MemberName.Split(' ', StringSplitOptions.RemoveEmptyEntries).LastOrDefault()?[..1] ?? "M";
     public string MemberCode => $"HV{_session.MemberId:0000}";

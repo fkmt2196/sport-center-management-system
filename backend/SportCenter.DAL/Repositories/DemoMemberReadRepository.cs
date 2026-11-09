@@ -22,7 +22,7 @@ public sealed class DemoMemberReadRepository : IMemberReadRepository
         MemberProfile? profile = memberId switch
         {
             1 => new(1, "Phạm Tùng Dương", "duong@example.com", "0900 000 001", _today.AddMonths(-3)),
-            2 => new(2, "Học viên mẫu 02", "member02@example.com", "0900 000 002", _today.AddMonths(-1)),
+            2 => new(2, "Học viên 02", "member02@example.com", "0900 000 002", _today.AddMonths(-1)),
             _ => null
         };
         return Task.FromResult(profile);

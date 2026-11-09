@@ -4,10 +4,6 @@ namespace SportCenter.Wpf.Services;
 public interface IMemberSession
 {
     int MemberId { get; }
-    bool IsDemo { get; }
 }
 
-public sealed record DemoMemberSession(int MemberId = 1) : IMemberSession
-{
-    public bool IsDemo => true;
-}
+public sealed record DemoMemberSession(int MemberId = 1) : IMemberSession;

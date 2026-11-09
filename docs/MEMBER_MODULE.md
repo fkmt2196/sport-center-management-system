@@ -1,8 +1,8 @@
 # Module học viên và style dùng chung
 
 Phần của Dương gồm giao diện học viên, lịch sử tập luyện, tiến độ, thông tin gói
-tập và bộ style WPF dùng chung. Module chạy bằng dữ liệu mẫu qua interface để có
-thể phát triển độc lập với database, đăng nhập và booking engine.
+tập và bộ style WPF dùng chung. Module đọc dữ liệu trong bộ nhớ qua interface để
+có thể phát triển độc lập với database, đăng nhập và booking engine.
 
 ## Chạy trên Windows
 
@@ -13,9 +13,9 @@ dotnet build SportCenterManagement.sln
 dotnet run --project frontend/SportCenter.Wpf/SportCenter.Wpf.csproj
 ```
 
-App mở thẳng Member Dashboard trong chế độ **Dữ liệu mẫu**, dùng `DemoMemberSession`
-với MemberID 1. Đây là tài khoản demo phục vụ phát triển, không phải đăng nhập hay
-cơ chế phân quyền. Dữ liệu chỉ đọc, không lưu thay đổi sau khi đóng app.
+App mở thẳng Member Dashboard với MemberID 1 được cấu hình sẵn trong
+`DemoMemberSession`. Luồng này chưa tích hợp đăng nhập hoặc phân quyền. Dữ liệu
+chỉ đọc và chưa kết nối SQL Server.
 
 ## Chức năng
 
@@ -28,9 +28,9 @@ cơ chế phân quyền. Dữ liệu chỉ đọc, không lưu thay đổi sau k
 - Gói tập: thời hạn, số buổi sử dụng/còn lại và trạng thái; hồ sơ học viên.
 - Các trạng thái đang tải, không có dữ liệu, lỗi có thể thử lại.
 
-Lịch mẫu có ba tuần: tuần trước, tuần hiện tại và tuần sau theo ngày chạy app.
-Tuần xa hơn hiển thị trạng thái trống. Gói tập và lịch sử mẫu dùng ngày tương đối
-để màn hình demo vẫn có dữ liệu khi chạy vào ngày khác.
+Lịch trong bộ nhớ có ba tuần: tuần trước, tuần hiện tại và tuần sau theo ngày chạy
+app. Tuần xa hơn hiển thị trạng thái trống. Ngày của gói tập và lịch sử cũng được
+tính theo ngày chạy app.
 
 ## Nơi tích hợp với các thành viên khác
 

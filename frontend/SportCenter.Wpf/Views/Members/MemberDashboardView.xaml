@@ -38,17 +38,10 @@
         </Border>
 
         <DockPanel Grid.Column="1" Margin="32,26,24,20">
-            <Grid DockPanel.Dock="Top" Margin="0,0,8,22">
-                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                <StackPanel>
-                    <TextBlock Text="{Binding TodayLabel}" FontSize="12" Style="{StaticResource MutedTextStyle}" />
-                    <TextBlock Text="{Binding Greeting}" FontSize="23" FontWeight="SemiBold" Margin="0,8,12,0" TextWrapping="Wrap" />
-                </StackPanel>
-                <Border Grid.Column="1" Background="{StaticResource WarningLightBrush}" Padding="12,7" CornerRadius="6"
-                        VerticalAlignment="Top" Visibility="{Binding IsDemo, Converter={StaticResource BoolToVisibility}}">
-                    <TextBlock Text="DỮ LIỆU MẪU" Foreground="{StaticResource WarningBrush}" FontSize="11" FontWeight="SemiBold" />
-                </Border>
-            </Grid>
+            <StackPanel DockPanel.Dock="Top" Margin="0,0,8,22">
+                <TextBlock Text="{Binding TodayLabel}" FontSize="12" Style="{StaticResource MutedTextStyle}" />
+                <TextBlock Text="{Binding Greeting}" FontSize="23" FontWeight="SemiBold" Margin="0,8,12,0" TextWrapping="Wrap" />
+            </StackPanel>
             <StackPanel DockPanel.Dock="Top">
                 <ProgressBar IsIndeterminate="True" Height="3" Margin="0,0,8,12"
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
