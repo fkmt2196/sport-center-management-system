@@ -1,0 +1,105 @@
+﻿<Window x:Class="Project.Frontend.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:c="clr-namespace:Project.Frontend.Controls"
+        mc:Ignorable="d"
+        Title="Đăng nhập - Trung tâm Đào tạo"
+        Width="920" Height="580" MinWidth="380" MinHeight="520"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{StaticResource AppFont}"
+        Background="{StaticResource SurfaceBrush}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="BrandColumn" Width="5*"/>
+            <ColumnDefinition Width="6*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Khối thương hiệu -->
+        <Border x:Name="BrandPanel" Grid.Column="0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#1E40AF" Offset="0"/>
+                    <GradientStop Color="#2563EB" Offset="0.55"/>
+                    <GradientStop Color="#3B82F6" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid Margin="40">
+                <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
+                    <Border Width="44" Height="44" CornerRadius="12" Background="#33FFFFFF">
+                        <TextBlock Style="{StaticResource Text.Icon}" Text="&#xE7BE;" FontSize="22" Foreground="White" HorizontalAlignment="Center"/>
+                    </Border>
+                    <TextBlock x:Name="BrandName" Margin="14,0,0,0" VerticalAlignment="Center" FontSize="18" FontWeight="SemiBold" Foreground="White"/>
+                </StackPanel>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Quản lý đào tạo" FontSize="30" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="đơn giản và hiệu quả" FontSize="30" FontWeight="Bold" Foreground="#BFDBFE"/>
+                    <TextBlock Margin="0,16,0,0" FontSize="14" Foreground="#DBEAFE" TextWrapping="Wrap" LineHeight="22"
+                               Text="Theo dõi học viên, giảng viên, khóa học, lịch học và điểm danh trên một nền tảng duy nhất."/>
+                </StackPanel>
+                <TextBlock x:Name="BrandFooter" VerticalAlignment="Bottom" FontSize="12" Foreground="#93C5FD"/>
+            </Grid>
+        </Border>
+
+        <!-- Form đăng nhập -->
+        <Grid Grid.Column="1">
+            <StackPanel x:Name="LoginPanel" VerticalAlignment="Center" HorizontalAlignment="Center" Width="340" Margin="24">
+                <TextBlock Text="Đăng nhập" Style="{StaticResource Text.H1}" FontSize="26"/>
+                <TextBlock Text="Chào mừng bạn quay lại! Vui lòng nhập thông tin tài khoản." Style="{StaticResource Text.Secondary}" Margin="0,6,0,28"/>
+
+                <TextBlock Text="Tên đăng nhập" Style="{StaticResource Text.Label}"/>
+                <TextBox x:Name="UsernameTextBox" MinHeight="44" c:Ui.Icon="&#xE77B;" c:Ui.Placeholder="Nhập tên đăng nhập" Margin="0,0,0,16"/>
+
+                <TextBlock Text="Mật khẩu" Style="{StaticResource Text.Label}"/>
+                <PasswordBox x:Name="PasswordBox" MinHeight="44" c:Ui.Icon="&#xE72E;" Margin="0,0,0,8"/>
+
+                <Border x:Name="ErrorPanel" Background="{StaticResource DangerSoftBrush}" CornerRadius="{StaticResource RadiusMd}"
+                        Padding="12,8" Margin="0,8,0,0" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{StaticResource Text.Icon}" Text="&#xE783;" Foreground="{StaticResource DangerBrush}" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="ErrorMessage" Foreground="{StaticResource DangerBrush}" FontSize="13" TextWrapping="Wrap" MaxWidth="280"/>
+                    </StackPanel>
+                </Border>
+
+                <Button x:Name="LoginButton" Style="{StaticResource Btn.Primary}" Height="46" FontSize="14" Margin="0,20,0,0"
+                        IsDefault="True" Click="LoginButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="LoginButtonText" Text="Đăng nhập" VerticalAlignment="Center"/>
+                        <TextBlock Style="{StaticResource Text.Icon}" Text="&#xE72A;" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </Button>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,18,0,0">
+                    <TextBlock Text="Chưa có tài khoản?" Style="{StaticResource Text.Secondary}" VerticalAlignment="Center"/>
+                    <Button x:Name="ShowRegisterButton" Content="Đăng ký thành viên" Style="{StaticResource Btn.Ghost}" Foreground="{StaticResource PrimaryBrush}"
+                            Height="30" Padding="8,0" Click="ShowRegister_Click"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Đăng ký tài khoản thành viên -->
+            <ScrollViewer x:Name="RegisterPanel" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="360" Margin="24">
+                    <TextBlock Text="Đăng ký thành viên" Style="{StaticResource Text.H1}" FontSize="24"/>
+                    <TextBlock Text="Tạo tài khoản để xem lịch, đăng ký lớp và gói tập." Style="{StaticResource Text.Secondary}" Margin="0,6,0,20"/>
+                    <TextBlock Text="Họ và tên *" Style="{StaticResource Text.Label}"/>
+                    <TextBox x:Name="RegFullName" c:Ui.Placeholder="vd. Nguyễn Văn An" MaxLength="150" Margin="0,0,0,12"/>
+                    <TextBlock Text="Tên đăng nhập *" Style="{StaticResource Text.Label}"/>
+                    <TextBox x:Name="RegUsername" c:Ui.Placeholder="3–50 ký tự, không dấu" MaxLength="50" Margin="0,0,0,12"/>
+                    <TextBlock Text="Số điện thoại *" Style="{StaticResource Text.Label}"/>
+                    <TextBox x:Name="RegPhone" c:Ui.Placeholder="09xxxxxxxx" MaxLength="20" Margin="0,0,0,12"/>
+                    <TextBlock Text="Email" Style="{StaticResource Text.Label}"/>
+                    <TextBox x:Name="RegEmail" c:Ui.Placeholder="ten@gmail.com" MaxLength="150" Margin="0,0,0,12"/>
+                    <TextBlock Text="Mật khẩu * (tối thiểu 6 ký tự)" Style="{StaticResource Text.Label}"/>
+                    <PasswordBox x:Name="RegPassword" Margin="0,0,0,12"/>
+                    <TextBlock Text="Nhập lại mật khẩu *" Style="{StaticResource Text.Label}"/>
+                    <PasswordBox x:Name="RegConfirm"/>
+                    <Border x:Name="RegErrorPanel" Background="{StaticResource DangerSoftBrush}" CornerRadius="{StaticResource RadiusMd}" Padding="12,8" Margin="0,12,0,0" Visibility="Collapsed">
+                        <TextBlock x:Name="RegError" Foreground="{StaticResource DangerBrush}" FontSize="13" TextWrapping="Wrap"/>
+                    </Border>
+                    <Button x:Name="RegisterButton" Content="Tạo tài khoản" Style="{StaticResource Btn.Primary}" Height="44" Margin="0,18,0,0" Click="Register_Click"/>
+                    <Button Content="← Quay lại đăng nhập" Style="{StaticResource Btn.Ghost}" Height="34" Margin="0,8,0,0" Click="ShowLogin_Click"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>

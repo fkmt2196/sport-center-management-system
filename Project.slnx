@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Project/Project.csproj" />
+  <Project Path="SportsCenter.Core/SportsCenter.Core.csproj" />
+</Solution>

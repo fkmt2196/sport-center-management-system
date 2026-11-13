@@ -1,0 +1,143 @@
+<Window x:Class="Project.Frontend.Views.DashboardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:c="clr-namespace:Project.Frontend.Controls"
+        mc:Ignorable="d"
+        Title="Trung tâm Đào tạo - Quản trị"
+        Width="1280" Height="800" MinWidth="400" MinHeight="500"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{StaticResource AppFont}"
+        Foreground="{StaticResource TextBrush}"
+        Background="{StaticResource BgBrush}">
+    <Grid x:Name="Root">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="SidebarColumn" Width="240"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ============ VÙNG CHÍNH: header / nội dung / footer ============ -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="64"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+                <Grid Margin="12,0,20,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Chuông thông báo -->
+                    <Grid Grid.Column="3" Margin="0,0,14,0" VerticalAlignment="Center">
+                        <Button x:Name="BellButton" Style="{StaticResource Btn.Icon}" Content="&#xEA8F;" FontSize="16" ToolTip="Thông báo" Click="BellButton_Click"/>
+                        <Border x:Name="BellBadge" Background="{StaticResource DangerBrush}" CornerRadius="9" MinWidth="18" Height="18" Padding="4,0"
+                                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-6,0" Visibility="Collapsed" IsHitTestVisible="False">
+                            <TextBlock x:Name="BellCount" Foreground="White" FontSize="10" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+
+                    <Button x:Name="MenuToggleButton" Style="{StaticResource Btn.Icon}" Content="&#xE700;" FontSize="16"
+                            ToolTip="Thu gọn / mở rộng menu" Click="MenuToggleButton_Click"/>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,12,0">
+                        <TextBlock x:Name="CenterNameText" Style="{StaticResource Text.H3}" FontSize="16" Foreground="{StaticResource PrimaryBrush}"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock x:Name="BreadcrumbSeparator" Text="&#xE76C;" Style="{StaticResource Text.Icon}" FontSize="10"
+                                   Foreground="{StaticResource TextMutedBrush}" Margin="10,0"/>
+                        <TextBlock x:Name="PageTitleText" Style="{StaticResource Text.H3}" FontSize="16" FontWeight="Normal"
+                                   Foreground="{StaticResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+
+                    <StackPanel x:Name="HeaderDate" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
+                        <TextBlock Style="{StaticResource Text.Icon}" Text="&#xE787;" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="TodayText" Style="{StaticResource Text.Secondary}" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Người dùng -->
+                    <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="36" Height="36" CornerRadius="18" Background="{StaticResource PrimarySoft2Brush}">
+                            <TextBlock x:Name="AvatarText" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource PrimaryPressedBrush}"/>
+                        </Border>
+                        <StackPanel x:Name="UserInfoPanel" Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="UserInfoTextBlock" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
+                            <TextBlock x:Name="UserRoleText" Style="{StaticResource Text.Caption}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button Grid.Column="5" Style="{StaticResource Btn.IconDanger}" Content="&#xE7E8;" Margin="12,0,0,0"
+                            ToolTip="Đăng xuất" Click="LogoutButton_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Nội dung trang -->
+            <ContentControl x:Name="ContentArea" Grid.Row="1" Margin="24" Focusable="False"/>
+
+            <!-- Footer -->
+            <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="24,10">
+                <DockPanel>
+                    <TextBlock x:Name="FooterEnvText" DockPanel.Dock="Right" Style="{StaticResource Text.Caption}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="FooterText" Style="{StaticResource Text.Caption}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <!-- Nền mờ khi mở menu dạng trượt (màn hình hẹp) -->
+        <Border x:Name="SidebarBackdrop" Grid.ColumnSpan="2" Background="{StaticResource BackdropBrush}" Visibility="Collapsed"
+                Panel.ZIndex="9" MouseDown="SidebarBackdrop_MouseDown"/>
+
+        <!-- ============ SIDEBAR ============ -->
+        <Border x:Name="Sidebar" Grid.Column="0" Background="{StaticResource SidebarBrush}" Panel.ZIndex="10" HorizontalAlignment="Stretch">
+            <DockPanel>
+                <!-- Logo + tên trung tâm -->
+                <Border DockPanel.Dock="Top" Height="64" Padding="18,0" BorderBrush="{StaticResource SidebarHoverBrush}" BorderThickness="0,0,0,1">
+                    <StackPanel x:Name="BrandPanel" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="36" Height="36" CornerRadius="10" Background="{StaticResource PrimaryBrush}">
+                            <TextBlock Style="{StaticResource Text.Icon}" Text="&#xE7BE;" FontSize="18" Foreground="White" HorizontalAlignment="Center"/>
+                        </Border>
+                        <StackPanel x:Name="BrandText" Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="SidebarCenterName" Foreground="White" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="SidebarTagline" Foreground="{StaticResource SidebarMutedBrush}" FontSize="11"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Đăng xuất (dưới cùng) -->
+                <Border DockPanel.Dock="Bottom" Padding="12" BorderBrush="{StaticResource SidebarHoverBrush}" BorderThickness="0,1,0,0">
+                    <RadioButton x:Name="SidebarLogout" Style="{StaticResource Nav.Item}" GroupName="SidebarActions"
+                                 Tag="&#xE7E8;" Content="Đăng xuất" ToolTip="Đăng xuất" Checked="SidebarLogout_Checked"/>
+                </Border>
+
+                <!-- Menu -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="12,16,12,12">
+                        <TextBlock x:Name="NavSectionLabel" Text="MENU" Foreground="{StaticResource SidebarMutedBrush}" FontSize="11"
+                                   FontWeight="SemiBold" Margin="14,0,0,8"/>
+                        <StackPanel x:Name="NavPanel"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- ============ LỚP PHỦ HỘP THOẠI ============ -->
+        <Grid x:Name="DialogLayer" Grid.ColumnSpan="2" Panel.ZIndex="100" Visibility="Collapsed" Background="{StaticResource BackdropBrush}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ContentControl x:Name="DialogHost" Margin="16,32" HorizontalAlignment="Center" VerticalAlignment="Center" Focusable="False"/>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- ============ TOAST ============ -->
+        <StackPanel x:Name="ToastLayer" Grid.ColumnSpan="2" Panel.ZIndex="200" HorizontalAlignment="Right" VerticalAlignment="Top"
+                    Margin="0,72,24,0"/>
+    </Grid>
+</Window>
