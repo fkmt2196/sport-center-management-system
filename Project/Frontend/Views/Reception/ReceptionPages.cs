@@ -1,3 +1,4 @@
+using SportsCenter.BLL;
 using System.Windows;
 using Project.Frontend.Controls;
 using Project.Frontend.Data;
@@ -19,7 +20,7 @@ namespace Project.Frontend.Views.Reception
             Subtitle = "Tìm thành viên (tên, SĐT, mã) rồi bấm Check-in",
             Unit = "thành viên",
             EmptyIcon = Icons.People,
-            Load = async () => (await UiScope.Run(s => s.Members.ListAsync())).Select(m => MemberRow.From(m)).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Members.ListAsync())).Select(m => MemberRow.From(m)).ToList(),
             Search = r => $"{r.FullName} {r.Username} {r.Phone}",
             SearchPlaceholder = "Nhập tên, số điện thoại hoặc tên đăng nhập của thành viên...",
             DefaultSort = nameof(MemberRow.FullName),
@@ -41,7 +42,7 @@ namespace Project.Frontend.Views.Reception
             {
                 new("Lượt vào hôm nay", Icons.Clock, async () =>
                 {
-                    var list = await UiScope.Run(s => s.Attendance.CheckInsAsync(DateTime.Today));
+                    var list = await ServiceScope.Run(s => s.Attendance.CheckInsAsync(DateTime.Today));
                     await InfoDialog.ShowAsync("Lượt check-in hôm nay", $"{list.Count} lượt · {DateTime.Today:dd/MM/yyyy}", Icons.Checklist, new[]
                     {
                         new InfoSection("Danh sách", list.Select(c => (c.CheckInTime.ToString("HH:mm"), $"{c.Member?.User?.FullName} ({c.Member?.User?.Username})"))
@@ -55,7 +56,7 @@ namespace Project.Frontend.Views.Reception
             {
                 new RowAction<MemberRow>(Icons.Success, "Check-in", async r =>
                 {
-                    var message = await UiScope.Run(s => s.Attendance.CheckInAsync(r.Id));
+                    var message = await ServiceScope.Run(s => s.Attendance.CheckInAsync(r.Id));
                     UiHost.Toast(message, r.MembershipState == "Expiring" ? ToastKind.Warning : ToastKind.Success);
                     if (r.MembershipState == "Expiring") UiHost.Toast($"Gói của {r.FullName} sắp hết hạn ({r.EndText}) – nhắc thành viên gia hạn.", ToastKind.Info);
                     return false;

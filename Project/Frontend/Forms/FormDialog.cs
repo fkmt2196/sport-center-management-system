@@ -429,7 +429,7 @@ namespace Project.Frontend.Forms
                 else if (_banner.Visibility != Visibility.Visible && _order.Any(u => u.Error.Visibility == Visibility.Visible))
                     ShowBanner("Vui lòng kiểm tra lại các trường được đánh dấu.");
             }
-            catch (SportsCenter.Core.Services.ValidationException ex)
+            catch (SportsCenter.BLL.Services.ValidationException ex)
             {
                 if (ex.Field != null && _fields.ContainsKey(ex.Field)) { SetError(ex.Field, ex.Message); ShowBanner("Vui lòng kiểm tra lại các trường được đánh dấu."); }
                 else ShowBanner(ex.Message);

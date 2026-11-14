@@ -3,7 +3,7 @@ using Anthropic;
 using Anthropic.Models.Beta;
 using Anthropic.Models.Beta.Messages;
 
-namespace SportsCenter.Core.AI
+namespace SportsCenter.BLL.AI
 {
     /// <summary>
     /// Trợ lý AI dùng Claude (SDK chính thức của Anthropic). API key đọc từ biến môi trường ANTHROPIC_API_KEY.

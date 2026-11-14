@@ -1,11 +1,12 @@
+using SportsCenter.BLL;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Project.Frontend.Controls;
 using Project.Frontend.Data;
 using Project.Frontend.Shell;
-using SportsCenter.Core.Models;
-using SportsCenter.Core.Services;
+using SportsCenter.DAL.Models;
+using SportsCenter.BLL.Services;
 
 namespace Project.Frontend.Views.Shared
 {
@@ -16,7 +17,7 @@ namespace Project.Frontend.Views.Shared
 
         public static async Task<bool> ShowAsync(SessionRow session)
         {
-            var roster = await UiScope.Run(s => s.Attendance.RosterAsync(session.Id));
+            var roster = await ServiceScope.Run(s => s.Attendance.RosterAsync(session.Id));
             if (roster.Count == 0) { UiHost.Toast("Lớp chưa có học viên nào đăng ký.", ToastKind.Info); return false; }
 
             var statuses = new[] { AttendanceStatus.Present, AttendanceStatus.Late, AttendanceStatus.Absent, AttendanceStatus.Excused };
@@ -81,7 +82,7 @@ namespace Project.Frontend.Views.Shared
                 try
                 {
                     var items = rows.Select(r => (r.Item.MemberId, r.Radios.First(x => x.Value.IsChecked == true).Key, r.Notes.Text)).ToList();
-                    await UiScope.Run(s => s.Attendance.SaveAttendanceAsync(session.Id, items));
+                    await ServiceScope.Run(s => s.Attendance.SaveAttendanceAsync(session.Id, items));
                     UiHost.CloseDialog(true);
                     UiHost.Toast($"Đã lưu điểm danh: {items.Count(i => i.Key is AttendanceStatus.Present or AttendanceStatus.Late)}/{items.Count} có mặt.");
                 }

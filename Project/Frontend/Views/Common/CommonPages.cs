@@ -1,3 +1,4 @@
+using SportsCenter.BLL;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -6,9 +7,9 @@ using Project.Frontend.Controls;
 using Project.Frontend.Data;
 using Project.Frontend.Forms;
 using Project.Frontend.Shell;
-using SportsCenter.Core.AI;
-using SportsCenter.Core.Models;
-using SportsCenter.Core.Services;
+using SportsCenter.BLL.AI;
+using SportsCenter.DAL.Models;
+using SportsCenter.BLL.Services;
 
 namespace Project.Frontend.Views.Common
 {
@@ -27,7 +28,7 @@ namespace Project.Frontend.Views.Common
             var canSend = Me.User.Role is UserRole.Coach or UserRole.Manager;
             async Task<bool> Open(NotificationRow r)
             {
-                if (r.Entity.IsRead == false) { await UiScope.Run(s => s.Notifications.MarkReadAsync(r.Id)); await UiHost.RefreshNotificationsAsync(); }
+                if (r.Entity.IsRead == false) { await ServiceScope.Run(s => s.Notifications.MarkReadAsync(r.Id)); await UiHost.RefreshNotificationsAsync(); }
                 await InfoDialog.ShowAsync(r.Title, $"{StatusBadge.Describe("notify", r.Type).Label} · {r.Sender} · {r.TimeText}", Icons.Info,
                     new[] { new InfoSection("Nội dung", Body: r.Body) });
                 return true;
@@ -36,7 +37,7 @@ namespace Project.Frontend.Views.Common
             {
                 new("Đánh dấu đã đọc tất cả", Icons.Success, async () =>
                 {
-                    await UiScope.Run(s => s.Notifications.MarkAllReadAsync(Me.User.Id));
+                    await ServiceScope.Run(s => s.Notifications.MarkAllReadAsync(Me.User.Id));
                     await UiHost.RefreshNotificationsAsync();
                     return true;
                 }, Primary: !canSend),
@@ -49,7 +50,7 @@ namespace Project.Frontend.Views.Common
                 Unit = "thông báo",
                 EmptyIcon = Icons.Info,
                 EmptyText = "Không có thông báo",
-                Load = async () => (await UiScope.Run(s => s.Notifications.ForUserAsync(Me.User.Id))).Select(n => new NotificationRow { Entity = n }).ToList(),
+                Load = async () => (await ServiceScope.Run(s => s.Notifications.ForUserAsync(Me.User.Id))).Select(n => new NotificationRow { Entity = n }).ToList(),
                 Search = r => r.Title + " " + r.Body + " " + r.Sender,
                 SearchPlaceholder = "Tìm theo tiêu đề, nội dung, người gửi...",
                 DefaultSort = nameof(NotificationRow.CreatedAt),
@@ -93,8 +94,8 @@ namespace Project.Frontend.Views.Common
             _body.Children.Add(new TextBlock { Text = "Tài khoản của tôi", Style = Ui2.R<Style>("Text.H1"), Margin = new Thickness(0, 0, 0, 16) });
             try
             {
-                Member? member = Me.MemberId is int mid ? await UiScope.Run(s => s.Members.GetAsync(mid)) : null;
-                Coach? coach = Me.CoachId is int ? await UiScope.Run(s => s.Coaches.GetByUserIdAsync(Me.User.Id)) : null;
+                Member? member = Me.MemberId is int mid ? await ServiceScope.Run(s => s.Members.GetAsync(mid)) : null;
+                Coach? coach = Me.CoachId is int ? await ServiceScope.Run(s => s.Coaches.GetByUserIdAsync(Me.User.Id)) : null;
                 var user = member?.User ?? coach?.User ?? Me.User;
 
                 // Thẻ thông tin chính
@@ -283,14 +284,14 @@ namespace Project.Frontend.Views.Common
         private async Task LoadMembersAsync()
         {
             if (_memberPicker == null || Me.CoachId is not int cid || _memberPicker.Items.Count > 0) return;
-            var members = await UiScope.Run(s => s.Coaches.MyMembersAsync(cid));
+            var members = await ServiceScope.Run(s => s.Coaches.MyMembersAsync(cid));
             ListPage.FillFilter(_memberPicker, "— Chọn học viên —", members.Select(m => ($"{m.Member.User!.FullName} · {string.Join(", ", m.Classes)}", (object)m.Member.Id)));
         }
 
         private async Task<AiMemberProfile?> ProfileAsync()
         {
             var memberId = _memberPicker != null ? ListPage.SelectedValue(_memberPicker) as int? : Me.MemberId;
-            return memberId is int id ? await UiScope.Run(s => s.AiContext.BuildProfileAsync(id)) : null;
+            return memberId is int id ? await ServiceScope.Run(s => s.AiContext.BuildProfileAsync(id)) : null;
         }
 
         private async Task SuggestAsync()
@@ -312,7 +313,7 @@ namespace Project.Frontend.Views.Common
             if (question.Length == 0) return;
             _input.Clear();
             var profile = await ProfileAsync();
-            var info = await UiScope.Run(s => s.AiContext.CenterInfoAsync());
+            var info = await ServiceScope.Run(s => s.AiContext.CenterInfoAsync());
             await RunAsync(question, async () =>
             {
                 var answer = await _ai.AskAsync(question, profile, info, _history.ToList());

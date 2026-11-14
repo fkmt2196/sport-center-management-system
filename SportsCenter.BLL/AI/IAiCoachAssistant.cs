@@ -1,4 +1,4 @@
-namespace SportsCenter.Core.AI
+namespace SportsCenter.BLL.AI
 {
     /// <summary>Thông tin thành viên đưa vào AI để cá nhân hóa gợi ý.</summary>
     public record AiMemberProfile(

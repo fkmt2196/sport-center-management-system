@@ -1,3 +1,4 @@
+using SportsCenter.BLL;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -11,8 +12,8 @@ using Project.Frontend.Data;
 using Project.Frontend.Forms;
 using Project.Frontend.Shell;
 using Project.Frontend.Views.Shared;
-using SportsCenter.Core.Models;
-using SportsCenter.Core.Services;
+using SportsCenter.DAL.Models;
+using SportsCenter.BLL.Services;
 
 namespace Project.Frontend.Views.Manager
 {
@@ -94,7 +95,7 @@ namespace Project.Frontend.Views.Manager
         {
             try
             {
-                var (stats, revenue, members, sessions) = await UiScope.Run(async s => (
+                var (stats, revenue, members, sessions) = await ServiceScope.Run(async s => (
                     await s.Reports.DashboardAsync(), await s.Reports.RevenueByMonthAsync(6), await s.Reports.MembersByMonthAsync(6),
                     await s.Classes.SessionsAsync(DateTime.Today, DateTime.Today.AddDays(1))));
                 _members.SetValue(stats.TotalMembers.ToString("N0"), $"{stats.ActiveMembers} còn hạn gói · +{stats.NewMembersThisMonth} mới tháng này", stats.NewMembersThisMonth > 0 ? true : null);
@@ -227,7 +228,7 @@ namespace Project.Frontend.Views.Manager
             try
             {
                 var months = ListPage.SelectedValue(_period) as int? ?? 6;
-                (_rev, _mem, _classes) = await UiScope.Run(async s => (await s.Reports.RevenueByMonthAsync(months), await s.Reports.MembersByMonthAsync(months), await s.Reports.ClassFillAsync()));
+                (_rev, _mem, _classes) = await ServiceScope.Run(async s => (await s.Reports.RevenueByMonthAsync(months), await s.Reports.MembersByMonthAsync(months), await s.Reports.ClassFillAsync()));
                 var month = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
                 _revenue.SetData(_rev.Select(r => new BarPoint(M.MonthLabel(r.Month), (double)Math.Round((r.Value + r.Secondary) / 1_000_000m, 1),
                     $"{r.Month:MM/yyyy}: {r.Value + r.Secondary:N0} ₫ – gói {r.Value:N0} ₫, lớp & khác {r.Secondary:N0} ₫", r.Month == month)).ToList());
@@ -321,7 +322,7 @@ namespace Project.Frontend.Views.Manager
             Title = "Huấn luyện viên",
             Unit = "huấn luyện viên",
             EmptyIcon = Icons.Education,
-            Load = async () => (await UiScope.Run(s => s.Coaches.ListAsync())).Select(c => new CoachRowM { Entity = c }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Coaches.ListAsync())).Select(c => new CoachRowM { Entity = c }).ToList(),
             Search = r => $"{r.FullName} {r.Username} {r.Specialty} {r.Phone}",
             SearchPlaceholder = "Tìm theo tên, chuyên môn, số điện thoại...",
             DefaultSort = nameof(CoachRowM.FullName),
@@ -361,7 +362,7 @@ namespace Project.Frontend.Views.Manager
             Subtitle = "Mỗi vai trò chỉ thấy chức năng của mình",
             Unit = "tài khoản",
             EmptyIcon = Icons.Contact,
-            Load = async () => (await UiScope.Run(s => s.Accounts.ListAsync())).Select(u => new UserRowM { Entity = u }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Accounts.ListAsync())).Select(u => new UserRowM { Entity = u }).ToList(),
             Search = r => $"{r.FullName} {r.Username} {r.Phone} {r.Email}",
             SearchPlaceholder = "Tìm theo tên, tên đăng nhập, liên hệ...",
             DefaultSort = nameof(UserRowM.Role),
@@ -387,14 +388,14 @@ namespace Project.Frontend.Views.Manager
                 {
                     var u = r.Entity;
                     if (u.IsActive && !await UiHost.ConfirmAsync("Khóa tài khoản?", $"{u.FullName} sẽ không đăng nhập được cho tới khi mở khóa.", "Khóa")) return false;
-                    await UiScope.Run(s => s.Accounts.UpdateAsync(u.Id, u.FullName, u.Phone, u.Email, u.Role, !u.IsActive));
+                    await ServiceScope.Run(s => s.Accounts.UpdateAsync(u.Id, u.FullName, u.Phone, u.Email, u.Role, !u.IsActive));
                     UiHost.Toast(u.IsActive ? $"Đã khóa tài khoản {u.Username}." : $"Đã mở khóa tài khoản {u.Username}.");
                     return true;
                 }) { Visible = r => r.Entity.Id != Me.User.Id },
                 new RowAction<UserRowM>(Icons.Delete, "Xóa tài khoản", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Xóa tài khoản?", $"Xóa vĩnh viễn tài khoản {r.Username}. Tài khoản đã có dữ liệu sẽ không xóa được (hãy khóa).")) return false;
-                    await UiScope.Run(s => s.Accounts.DeleteAsync(r.Entity.Id));
+                    await ServiceScope.Run(s => s.Accounts.DeleteAsync(r.Entity.Id));
                     UiHost.Toast($"Đã xóa tài khoản {r.Username}.");
                     return true;
                 }) { Danger = true, Visible = r => r.Entity.Id != Me.User.Id },
@@ -410,7 +411,7 @@ namespace Project.Frontend.Views.Manager
                 Title = manage ? "Lớp học" : "Lớp của tôi",
                 Unit = "lớp",
                 EmptyIcon = Icons.Library,
-                Load = async () => (await UiScope.Run(s => s.Classes.ListAsync(coachId))).Select(c => new ClassRow { Info = c }).ToList(),
+                Load = async () => (await ServiceScope.Run(s => s.Classes.ListAsync(coachId))).Select(c => new ClassRow { Info = c }).ToList(),
                 Search = r => $"{r.Name} {r.SportName} {r.CoachName} {r.Description}",
                 SearchPlaceholder = "Tìm theo tên lớp, bộ môn, HLV...",
                 DefaultSort = nameof(ClassRow.Name),
@@ -448,7 +449,7 @@ namespace Project.Frontend.Views.Manager
                 spec.RowActions.Add(new RowAction<ClassRow>(Icons.Delete, "Xóa lớp", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Xóa lớp?", $"Xóa lớp \"{r.Name}\" cùng các ca học và đăng ký. Lớp đã có điểm danh/thanh toán thì không xóa được (hãy chuyển trạng thái Đã hủy).")) return false;
-                    await UiScope.Run(s => s.Classes.DeleteAsync(r.Id));
+                    await ServiceScope.Run(s => s.Classes.DeleteAsync(r.Id));
                     UiHost.Toast($"Đã xóa lớp \"{r.Name}\".");
                     return true;
                 }) { Danger = true });
@@ -463,7 +464,7 @@ namespace Project.Frontend.Views.Manager
 
         private static async Task<bool> ClassMembersAsync(ClassRow r, bool manage)
         {
-            var list = await UiScope.Run(s => s.Classes.ClassMembersAsync(r.Id));
+            var list = await ServiceScope.Run(s => s.Classes.ClassMembersAsync(r.Id));
             var rows = list.OrderBy(e => e.Member!.User!.FullName)
                 .Select(e => (e.Member!.User!.FullName, $"{e.Member.User.Phone} · {Labels.Level(e.Member.FitnessLevel)} · từ {e.EnrolledAt:dd/MM/yyyy}" + (e.Member.Goals.Length > 0 ? $" · Mục tiêu: {e.Member.Goals}" : ""))).ToList();
             await InfoDialog.ShowAsync($"Học viên lớp {r.Name}", $"{list.Count}/{r.Entity.Capacity} học viên · HLV {r.CoachName}", Icons.People,
@@ -483,7 +484,7 @@ namespace Project.Frontend.Views.Manager
                 Unit = "ca học",
                 EmptyIcon = Icons.Calendar,
                 EmptyText = "Không có ca học",
-                Load = async () => (await UiScope.Run(s => s.Classes.SessionsAsync(today.AddDays(-60), today.AddDays(61), coachId: coachId)))
+                Load = async () => (await ServiceScope.Run(s => s.Classes.SessionsAsync(today.AddDays(-60), today.AddDays(61), coachId: coachId)))
                     .Select(x => new SessionRow { Entity = x.Session, Enrolled = x.Enrolled, Present = x.Present }).ToList(),
                 Search = r => $"{r.ClassName} {r.SportName} {r.CoachName} {r.RoomName}",
                 SearchPlaceholder = "Tìm theo lớp, bộ môn, HLV, phòng...",
@@ -552,7 +553,7 @@ namespace Project.Frontend.Views.Manager
             Title = "Bộ môn",
             Unit = "bộ môn",
             EmptyIcon = Icons.Library,
-            Load = async () => (await UiScope.Run(s => s.Facilities.SportsAsync())).Select(x => new SportRow { Entity = x }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Facilities.SportsAsync())).Select(x => new SportRow { Entity = x }).ToList(),
             Search = r => r.Name + " " + r.Description,
             DefaultSort = nameof(SportRow.Name),
             Columns =
@@ -568,7 +569,7 @@ namespace Project.Frontend.Views.Manager
                 new RowAction<SportRow>(Icons.Delete, "Xóa", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Xóa bộ môn?", $"Xóa bộ môn \"{r.Name}\"?")) return false;
-                    await UiScope.Run(s => s.Facilities.DeleteSportAsync(r.Entity.Id));
+                    await ServiceScope.Run(s => s.Facilities.DeleteSportAsync(r.Entity.Id));
                     UiHost.Toast($"Đã xóa bộ môn \"{r.Name}\".");
                     return true;
                 }) { Danger = true },
@@ -592,7 +593,7 @@ namespace Project.Frontend.Views.Manager
             Title = "Phòng tập",
             Unit = "phòng",
             EmptyIcon = Icons.Location,
-            Load = async () => (await UiScope.Run(s => s.Facilities.RoomsAsync())).Select(x => new RoomRow { Entity = x }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Facilities.RoomsAsync())).Select(x => new RoomRow { Entity = x }).ToList(),
             Search = r => $"{r.Name} {r.Location} {r.Equipment}",
             DefaultSort = nameof(RoomRow.Name),
             Columns =
@@ -609,7 +610,7 @@ namespace Project.Frontend.Views.Manager
                 new RowAction<RoomRow>(Icons.Delete, "Xóa", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Xóa phòng?", $"Xóa phòng \"{r.Name}\"?")) return false;
-                    await UiScope.Run(s => s.Facilities.DeleteRoomAsync(r.Entity.Id));
+                    await ServiceScope.Run(s => s.Facilities.DeleteRoomAsync(r.Entity.Id));
                     UiHost.Toast($"Đã xóa phòng \"{r.Name}\".");
                     return true;
                 }) { Danger = true },
@@ -637,7 +638,7 @@ namespace Project.Frontend.Views.Manager
             Subtitle = "Học phí và thời hạn các gói",
             Unit = "gói",
             EmptyIcon = Icons.Money,
-            Load = async () => (await UiScope.Run(s => s.Memberships.PlansAsync())).Select(x => new PlanRow { Entity = x }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Memberships.PlansAsync())).Select(x => new PlanRow { Entity = x }).ToList(),
             Search = r => r.Name + " " + r.Description,
             DefaultSort = nameof(PlanRow.Days),
             Columns =
@@ -655,7 +656,7 @@ namespace Project.Frontend.Views.Manager
                 new RowAction<PlanRow>(Icons.Delete, "Xóa", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Xóa gói?", $"Xóa gói \"{r.Name}\"? Gói đã có người đăng ký sẽ không xóa được (hãy ngừng bán).")) return false;
-                    await UiScope.Run(s => s.Memberships.DeletePlanAsync(r.Entity.Id));
+                    await ServiceScope.Run(s => s.Memberships.DeletePlanAsync(r.Entity.Id));
                     UiHost.Toast($"Đã xóa gói \"{r.Name}\".");
                     return true;
                 }) { Danger = true },
@@ -672,7 +673,7 @@ namespace Project.Frontend.Views.Manager
                 Subtitle = "Ghi tự động mọi thay đổi dữ liệu và đăng nhập/đăng xuất (90 ngày gần nhất)",
                 Unit = "thao tác",
                 EmptyIcon = "",
-                Load = async () => (await UiScope.Run(s => s.Audit.ListAsync(today.AddDays(-90), today.AddDays(1)))).Select(a => new AuditRow { Entity = a }).ToList(),
+                Load = async () => (await ServiceScope.Run(s => s.Audit.ListAsync(today.AddDays(-90), today.AddDays(1)))).Select(a => new AuditRow { Entity = a }).ToList(),
                 Search = r => $"{r.Username} {r.Action} {r.EntityName} {r.Details}",
                 SearchPlaceholder = "Tìm theo người dùng, hành động, nội dung...",
                 DefaultSort = nameof(AuditRow.Timestamp),

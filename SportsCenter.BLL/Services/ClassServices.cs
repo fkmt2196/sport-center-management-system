@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using SportsCenter.Core.Data;
-using SportsCenter.Core.Models;
+using SportsCenter.DAL.Data;
+using SportsCenter.DAL.Models;
 
-namespace SportsCenter.Core.Services
+namespace SportsCenter.BLL.Services
 {
     // =====================================================================
     // BỘ MÔN & PHÒNG TẬP (Quản lý)
@@ -10,7 +10,7 @@ namespace SportsCenter.Core.Services
     public class FacilityService
     {
         private readonly SportsCenterContext _db;
-        public FacilityService(SportsCenterContext db) { _db = db; }
+        internal FacilityService(SportsCenterContext db) { _db = db; }
 
         public Task<List<Sport>> SportsAsync() =>
             _db.Sports.AsNoTracking().Include(s => s.Classes).OrderBy(s => s.Name).ToListAsync();
@@ -76,7 +76,7 @@ namespace SportsCenter.Core.Services
     {
         private readonly SportsCenterContext _db;
         private readonly NotificationService _notify;
-        public ClassService(SportsCenterContext db) { _db = db; _notify = new NotificationService(db); }
+        internal ClassService(SportsCenterContext db) { _db = db; _notify = new NotificationService(db); }
 
         // ---------------- Lớp ----------------
 
@@ -328,7 +328,7 @@ namespace SportsCenter.Core.Services
     public class AttendanceService
     {
         private readonly SportsCenterContext _db;
-        public AttendanceService(SportsCenterContext db) { _db = db; }
+        internal AttendanceService(SportsCenterContext db) { _db = db; }
 
         /// <summary>Danh sách thành viên của lớp kèm trạng thái điểm danh hiện có của buổi.</summary>
         public async Task<List<RosterItem>> RosterAsync(int sessionId)

@@ -1,4 +1,4 @@
-namespace SportsCenter.Core.Models
+namespace SportsCenter.DAL.Models
 {
     /// <summary>Tài khoản đăng nhập (mọi vai trò).</summary>
     public class User

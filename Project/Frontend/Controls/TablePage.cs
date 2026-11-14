@@ -228,7 +228,7 @@ namespace Project.Frontend.Controls
         private static async Task<bool> Safe(Func<Task<bool>> run)
         {
             try { return await run(); }
-            catch (SportsCenter.Core.Services.ValidationException ex) { UiHost.Toast(ex.Message, ToastKind.Warning); }
+            catch (SportsCenter.BLL.Services.ValidationException ex) { UiHost.Toast(ex.Message, ToastKind.Warning); }
             catch (UnauthorizedAccessException ex) { UiHost.Toast(ex.Message, ToastKind.Error); }
             catch (Exception ex) { UiHost.Toast($"Lỗi: {(ex.InnerException ?? ex).Message}", ToastKind.Error); }
             return false;

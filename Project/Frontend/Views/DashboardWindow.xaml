@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:c="clr-namespace:Project.Frontend.Controls"
         mc:Ignorable="d"
-        Title="Trung tâm Đào tạo - Quản trị"
+        Title="FitZone Sports Center"
         Width="1280" Height="800" MinWidth="400" MinHeight="500"
         WindowStartupLocation="CenterScreen"
         FontFamily="{StaticResource AppFont}"

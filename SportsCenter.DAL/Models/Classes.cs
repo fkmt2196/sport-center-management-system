@@ -1,4 +1,4 @@
-namespace SportsCenter.Core.Models
+namespace SportsCenter.DAL.Models
 {
     /// <summary>Bộ môn (Gym, Yoga, Boxing, Bơi lội...).</summary>
     public class Sport

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using SportsCenter.Core.Data;
-using SportsCenter.Core.Models;
+using SportsCenter.DAL.Data;
+using SportsCenter.DAL.Models;
 
-namespace SportsCenter.Core.Services
+namespace SportsCenter.BLL.Services
 {
     // =====================================================================
     // GÓI THÀNH VIÊN
@@ -10,7 +10,7 @@ namespace SportsCenter.Core.Services
     public class MembershipService
     {
         private readonly SportsCenterContext _db;
-        public MembershipService(SportsCenterContext db) { _db = db; }
+        internal MembershipService(SportsCenterContext db) { _db = db; }
 
         public Task<List<MembershipPlan>> PlansAsync(bool activeOnly = false) =>
             _db.Plans.AsNoTracking().Where(p => !activeOnly || p.IsActive).OrderBy(p => p.DurationDays).ThenBy(p => p.Price).ToListAsync();
@@ -95,10 +95,10 @@ namespace SportsCenter.Core.Services
     public class PaymentService
     {
         private readonly SportsCenterContext _db;
-        public PaymentService(SportsCenterContext db) { _db = db; }
+        internal PaymentService(SportsCenterContext db) { _db = db; }
 
         /// <summary>Số hóa đơn dạng HD261114-0001 (đánh số lại mỗi ngày).</summary>
-        public static async Task<string> NextInvoiceNoAsync(SportsCenterContext db, DateTime? at = null)
+        internal static async Task<string> NextInvoiceNoAsync(SportsCenterContext db, DateTime? at = null)
         {
             var prefix = $"HD{(at ?? DateTime.Now):yyMMdd}-";
             var last = await db.Payments.Where(p => p.InvoiceNo.StartsWith(prefix)).OrderByDescending(p => p.InvoiceNo).Select(p => p.InvoiceNo).FirstOrDefaultAsync();
@@ -204,7 +204,7 @@ namespace SportsCenter.Core.Services
     public class ReportService
     {
         private readonly SportsCenterContext _db;
-        public ReportService(SportsCenterContext db) { _db = db; }
+        internal ReportService(SportsCenterContext db) { _db = db; }
 
         public async Task<DashboardStats> DashboardAsync()
         {
@@ -269,7 +269,7 @@ namespace SportsCenter.Core.Services
     public class TrainingService
     {
         private readonly SportsCenterContext _db;
-        public TrainingService(SportsCenterContext db) { _db = db; }
+        internal TrainingService(SportsCenterContext db) { _db = db; }
 
         private IQueryable<TrainingPlan> PlanQuery() => _db.TrainingPlans.AsNoTracking()
             .Include(p => p.Coach).ThenInclude(c => c!.User)
@@ -381,7 +381,7 @@ namespace SportsCenter.Core.Services
     public class SupportService
     {
         private readonly SportsCenterContext _db;
-        public SupportService(SportsCenterContext db) { _db = db; }
+        internal SupportService(SportsCenterContext db) { _db = db; }
 
         public Task<List<SupportRequest>> ListAsync()
         {
@@ -409,7 +409,7 @@ namespace SportsCenter.Core.Services
     public class AuditService
     {
         private readonly SportsCenterContext _db;
-        public AuditService(SportsCenterContext db) { _db = db; }
+        internal AuditService(SportsCenterContext db) { _db = db; }
 
         public Task<List<AuditLog>> ListAsync(DateTime from, DateTime to)
         {

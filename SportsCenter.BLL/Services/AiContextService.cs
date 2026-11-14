@@ -1,10 +1,10 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using SportsCenter.Core.AI;
-using SportsCenter.Core.Data;
-using SportsCenter.Core.Models;
+using SportsCenter.BLL.AI;
+using SportsCenter.DAL.Data;
+using SportsCenter.DAL.Models;
 
-namespace SportsCenter.Core.Services
+namespace SportsCenter.BLL.Services
 {
     /// <summary>Dựng ngữ cảnh cho trợ lý AI từ dữ liệu trung tâm (hồ sơ, lịch sử tập, gói, giờ mở cửa).</summary>
     public class AiContextService
@@ -13,7 +13,7 @@ namespace SportsCenter.Core.Services
         public const string Address = "Địa chỉ: 123 Nguyễn Văn Linh, Quận 7, TP. Hồ Chí Minh – Hotline: 0909 123 456.";
 
         private readonly SportsCenterContext _db;
-        public AiContextService(SportsCenterContext db) { _db = db; }
+        internal AiContextService(SportsCenterContext db) { _db = db; }
 
         public async Task<AiMemberProfile> BuildProfileAsync(int memberId)
         {

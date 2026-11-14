@@ -1,3 +1,4 @@
+using SportsCenter.BLL;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -5,7 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-using SportsCenter.Core.Models;
+using SportsCenter.DAL.Models;
 using Project.Frontend.Controls;
 using Project.Frontend.Data;
 using Project.Frontend.Shell;
@@ -39,7 +40,7 @@ namespace Project.Frontend.Views
             UiHost.Register(this);
             Closed += (_, _) => UiHost.Unregister(this);
 
-            Title = $"{AppInfo.CenterName} - Quản trị";
+            Title = $"{AppInfo.CenterName} - {AppInfo.RoleDisplayName(user.Role)}";
             CenterNameText.Text = AppInfo.CenterName;
             SidebarCenterName.Text = AppInfo.CenterName;
             SidebarTagline.Text = AppInfo.CenterTagline;
@@ -108,7 +109,7 @@ namespace Project.Frontend.Views
             try
             {
                 if (_currentUser.Role == UserRole.Member)
-                    await UiScope.Run(s => s.Notifications.GenerateRemindersAsync(_currentUser.Id));
+                    await ServiceScope.Run(s => s.Notifications.GenerateRemindersAsync(_currentUser.Id));
                 await RefreshNotificationsAsync();
             }
             catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex); }
@@ -116,7 +117,7 @@ namespace Project.Frontend.Views
 
         public async Task RefreshNotificationsAsync()
         {
-            var unread = await UiScope.Run(s => s.Notifications.UnreadCountAsync(_currentUser.Id));
+            var unread = await ServiceScope.Run(s => s.Notifications.UnreadCountAsync(_currentUser.Id));
             BellBadge.Visibility = unread > 0 ? Visibility.Visible : Visibility.Collapsed;
             BellCount.Text = unread > 99 ? "99+" : unread.ToString();
             BellButton.ToolTip = unread > 0 ? $"{unread} thông báo chưa đọc" : "Thông báo";
@@ -215,7 +216,7 @@ namespace Project.Frontend.Views
 
         private async void LogoutButton_Click(object sender, RoutedEventArgs e)
         {
-            try { await UiScope.Run(s => s.Auth.LogoutAsync()); } catch { /* vẫn đăng xuất khỏi giao diện */ }
+            try { await ServiceScope.Run(s => s.Auth.LogoutAsync()); } catch { /* vẫn đăng xuất khỏi giao diện */ }
             var loginWindow = new LoginWindow();
             loginWindow.Show();
             this.Close();

@@ -1,3 +1,4 @@
+using SportsCenter.BLL;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -7,8 +8,8 @@ using Project.Frontend.Forms;
 using Project.Frontend.Shell;
 using Project.Frontend.Views.Coaching;
 using Project.Frontend.Views.Shared;
-using SportsCenter.Core.Models;
-using SportsCenter.Core.Services;
+using SportsCenter.DAL.Models;
+using SportsCenter.BLL.Services;
 
 namespace Project.Frontend.Views.MemberArea
 {
@@ -51,7 +52,7 @@ namespace Project.Frontend.Views.MemberArea
                 Unit = "buổi",
                 EmptyIcon = Icons.Calendar,
                 EmptyText = "Chưa có buổi tập nào",
-                Load = async () => (await UiScope.Run(s => s.Classes.SessionsAsync(today.AddDays(-14), today.AddDays(45), memberId: MemberId)))
+                Load = async () => (await ServiceScope.Run(s => s.Classes.SessionsAsync(today.AddDays(-14), today.AddDays(45), memberId: MemberId)))
                     .Select(x => new SessionRow { Entity = x.Session, Enrolled = x.Enrolled, Present = x.Present }).ToList(),
                 Search = r => $"{r.ClassName} {r.CoachName} {r.RoomName}",
                 SearchPlaceholder = "Tìm theo lớp, huấn luyện viên, phòng...",
@@ -105,7 +106,7 @@ namespace Project.Frontend.Views.MemberArea
             EmptyIcon = Icons.Library,
             Load = async () =>
             {
-                var (classes, mine) = await UiScope.Run(async s => (await s.Classes.ListAsync(), await s.Classes.EnrollmentsOfMemberAsync(MemberId)));
+                var (classes, mine) = await ServiceScope.Run(async s => (await s.Classes.ListAsync(), await s.Classes.EnrollmentsOfMemberAsync(MemberId)));
                 return classes.Where(c => c.Class.Status == ClassStatus.Open || mine.Any(e => e.ClassId == c.Class.Id && e.Status == EnrollmentStatus.Active))
                     .Select(c =>
                     {
@@ -140,7 +141,7 @@ namespace Project.Frontend.Views.MemberArea
                 new RowAction<ClassRow>(Icons.Close, "Hủy đăng ký", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Hủy đăng ký lớp?", $"Bạn sẽ không còn trong danh sách lớp \"{r.Name}\" và không nhận lịch của lớp này.", "Hủy đăng ký")) return false;
-                    await UiScope.Run(s => s.Classes.CancelEnrollmentAsync(r.MyEnrollmentId!.Value));
+                    await ServiceScope.Run(s => s.Classes.CancelEnrollmentAsync(r.MyEnrollmentId!.Value));
                     UiHost.Toast($"Đã hủy đăng ký lớp \"{r.Name}\".");
                     return true;
                 }) { Danger = true, Visible = r => r.MyStatus == "Active" },
@@ -179,7 +180,7 @@ namespace Project.Frontend.Views.MemberArea
 
             private async Task LoadAsync()
             {
-                var (member, plans) = await UiScope.Run(async s => (await s.Members.GetAsync(MemberId), await s.Memberships.PlansAsync(activeOnly: true)));
+                var (member, plans) = await ServiceScope.Run(async s => (await s.Members.GetAsync(MemberId), await s.Memberships.PlansAsync(activeOnly: true)));
                 if (member == null) return;
                 var (state, end, plan) = Labels.Membership(member);
                 _top.Children.Clear();
@@ -240,7 +241,7 @@ namespace Project.Frontend.Views.MemberArea
             Title = "Lịch sử điểm danh",
             Unit = "buổi",
             EmptyIcon = Icons.Checklist,
-            Load = async () => (await UiScope.Run(s => s.Attendance.MemberHistoryAsync(MemberId))).Select(a => new AttendanceRow { Entity = a }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Attendance.MemberHistoryAsync(MemberId))).Select(a => new AttendanceRow { Entity = a }).ToList(),
             Search = r => $"{r.ClassName} {r.CoachName} {r.Notes}",
             DefaultSort = nameof(AttendanceRow.Start),
             SortDirection = System.ComponentModel.ListSortDirection.Descending,
@@ -268,7 +269,7 @@ namespace Project.Frontend.Views.MemberArea
             EmptyIcon = Icons.Success,
             Load = async () =>
             {
-                var (logs, reviews) = await UiScope.Run(async s => (await s.Training.LogsAsync(MemberId), await s.Training.ReviewsAsync(MemberId)));
+                var (logs, reviews) = await ServiceScope.Run(async s => (await s.Training.LogsAsync(MemberId), await s.Training.ReviewsAsync(MemberId)));
                 return logs.Select(l => new ProgressItem
                 {
                     Date = l.Date, Kind = "Log", Title = l.Session?.Class?.Name ?? "Buổi tập", Details = l.Exercises + (l.Notes.Length > 0 ? $" · {l.Notes}" : ""),
@@ -304,7 +305,7 @@ namespace Project.Frontend.Views.MemberArea
             Subtitle = "Kế hoạch cá nhân và kế hoạch của lớp do huấn luyện viên xây dựng",
             Unit = "kế hoạch",
             EmptyIcon = Icons.Edit,
-            Load = async () => (await UiScope.Run(s => s.Training.PlansOfMemberAsync(MemberId))).Select(p => new PlanRow { Entity = p }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Training.PlansOfMemberAsync(MemberId))).Select(p => new PlanRow { Entity = p }).ToList(),
             Search = r => $"{r.Title} {r.Goal} {r.Content} {r.CoachName}",
             DefaultSort = nameof(PlanRow.StartDate),
             SortDirection = System.ComponentModel.ListSortDirection.Descending,
@@ -328,7 +329,7 @@ namespace Project.Frontend.Views.MemberArea
             Title = "Lịch sử thanh toán",
             Unit = "hóa đơn",
             EmptyIcon = Icons.Money,
-            Load = async () => (await UiScope.Run(s => s.Payments.ListAsync(memberId: Me.MemberId ?? -1))).Select(p => new PaymentRow { Entity = p }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Payments.ListAsync(memberId: Me.MemberId ?? -1))).Select(p => new PaymentRow { Entity = p }).ToList(),
             Search = r => $"{r.InvoiceNo} {r.Note}",
             DefaultSort = nameof(PaymentRow.PaidAt),
             SortDirection = System.ComponentModel.ListSortDirection.Descending,

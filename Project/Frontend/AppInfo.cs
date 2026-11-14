@@ -1,4 +1,4 @@
-using SportsCenter.Core.Models;
+using SportsCenter.DAL.Models;
 
 namespace Project.Frontend
 {

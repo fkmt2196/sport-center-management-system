@@ -1,16 +1,15 @@
 using System.Globalization;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using SportsCenter.Core.Models;
-using SportsCenter.Core.Services;
+using SportsCenter.DAL.Models;
 
-namespace SportsCenter.Core.Data
+namespace SportsCenter.DAL.Data
 {
     /// <summary>
     /// Dữ liệu mẫu tiếng Việt cho trung tâm thể thao (môi trường Development). Chỉ chạy khi chưa có tài khoản nào.
     /// Mật khẩu mọi tài khoản mẫu: 123456. Danh sách tài khoản: ACCOUNTS.md.
     /// </summary>
-    public static class DbSeeder
+    internal static class DbSeeder
     {
         public const string DefaultPassword = "123456";
         private const int MemberCount = 60;
@@ -42,7 +41,8 @@ namespace SportsCenter.Core.Data
 
         #endregion
 
-        public static void Seed(SportsCenterContext db)
+        /// <param name="hashPassword">Hàm băm mật khẩu do BLL cung cấp (DAL không chứa nghiệp vụ bảo mật).</param>
+        public static void Seed(SportsCenterContext db, Func<string, string> hashPassword)
         {
             if (db.Users.Any()) return;
             db.AuditEnabled = false;
@@ -57,7 +57,7 @@ namespace SportsCenter.Core.Data
                 var (given, surname) = (fullName.Split(' ')[^1], fullName.Split(' ')[0]);
                 return new User
                 {
-                    Username = username, PasswordHash = PasswordHasher.Hash(DefaultPassword), FullName = fullName, Role = role,
+                    Username = username, PasswordHash = hashPassword(DefaultPassword), FullName = fullName, Role = role,
                     Email = $"{Slug(given)}.{Slug(surname)}.{username}@{emailDomain ?? EmailDomains[Rng.Next(EmailDomains.Length)]}",
                     Phone = UniquePhone(phones), CreatedAt = created,
                     LastLogin = Rng.Next(3) == 0 ? null : now.AddDays(-Rng.Next(0, 20)).AddHours(-Rng.Next(0, 10))

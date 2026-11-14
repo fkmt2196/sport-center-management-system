@@ -1,4 +1,4 @@
-namespace SportsCenter.Core.Models
+namespace SportsCenter.DAL.Models
 {
     // ===================== GÓI THÀNH VIÊN & THANH TOÁN =====================
 

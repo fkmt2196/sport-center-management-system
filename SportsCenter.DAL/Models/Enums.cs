@@ -1,4 +1,4 @@
-namespace SportsCenter.Core.Models
+namespace SportsCenter.DAL.Models
 {
     // Lưu trong CSDL dưới dạng chuỗi (xem SportsCenterContext.ConfigureConventions).
 

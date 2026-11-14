@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace SportsCenter.Core.Data
+namespace SportsCenter.DAL.Data
 {
     /// <summary>Cấu hình kết nối CSDL dùng chung cho mọi ứng dụng (WPF, web...).</summary>
-    public static class DbConfig
+    internal static class DbConfig
     {
         /// <summary>
         /// Có thể ghi đè bằng biến môi trường SPORTSCENTER_DB.
@@ -19,7 +19,7 @@ namespace SportsCenter.Core.Data
     }
 
     /// <summary>Dùng bởi "dotnet ef" khi tạo migration.</summary>
-    public class SportsCenterContextFactory : IDesignTimeDbContextFactory<SportsCenterContext>
+    internal class SportsCenterContextFactory : IDesignTimeDbContextFactory<SportsCenterContext>
     {
         public SportsCenterContext CreateDbContext(string[] args) => DbConfig.CreateContext();
     }

@@ -1,11 +1,12 @@
+using SportsCenter.BLL;
 using System.Windows;
 using Project.Frontend.Controls;
 using Project.Frontend.Data;
 using Project.Frontend.Forms;
 using Project.Frontend.Shell;
 using Project.Frontend.Views.Shared;
-using SportsCenter.Core.AI;
-using SportsCenter.Core.Models;
+using SportsCenter.BLL.AI;
+using SportsCenter.DAL.Models;
 
 namespace Project.Frontend.Views.Coaching
 {
@@ -76,7 +77,7 @@ namespace Project.Frontend.Views.Coaching
             Subtitle = "Học viên đang học các lớp bạn phụ trách",
             Unit = "học viên",
             EmptyIcon = Icons.People,
-            Load = async () => (await UiScope.Run(s => s.Coaches.MyMembersAsync(CoachId)))
+            Load = async () => (await ServiceScope.Run(s => s.Coaches.MyMembersAsync(CoachId)))
                 .Select(x => new MyMemberRow { Entity = x.Member, Classes = string.Join(", ", x.Classes) }).ToList(),
             Search = r => $"{r.FullName} {r.Classes} {r.Goals}",
             SearchPlaceholder = "Tìm theo tên, lớp, mục tiêu...",
@@ -108,7 +109,7 @@ namespace Project.Frontend.Views.Coaching
         /// <summary>Hồ sơ, mục tiêu, kết quả tập gần đây và nhận xét của một học viên.</summary>
         public static async Task<bool> MemberProgressAsync(int memberId, string name)
         {
-            var (m, logs, reviews, att) = await UiScope.Run(async s => (await s.Members.GetAsync(memberId), await s.Training.LogsAsync(memberId), await s.Training.ReviewsAsync(memberId), await s.Attendance.MemberHistoryAsync(memberId)));
+            var (m, logs, reviews, att) = await ServiceScope.Run(async s => (await s.Members.GetAsync(memberId), await s.Training.LogsAsync(memberId), await s.Training.ReviewsAsync(memberId), await s.Attendance.MemberHistoryAsync(memberId)));
             if (m == null) return false;
             var since = DateTime.Today.AddDays(-30);
             var recent = att.Where(a => a.Session!.StartTime >= since).ToList();
@@ -134,7 +135,7 @@ namespace Project.Frontend.Views.Coaching
         public static async Task<bool> AiSuggestAsync(int memberId)
         {
             var ai = AiAssistantFactory.Create();
-            var profile = await UiScope.Run(s => s.AiContext.BuildProfileAsync(memberId));
+            var profile = await ServiceScope.Run(s => s.AiContext.BuildProfileAsync(memberId));
             UiHost.Toast($"Đang tạo gợi ý cho {profile.Name}...", ToastKind.Info);
             var suggestion = await ai.SuggestWorkoutAsync(profile, null);
             var saved = false;
@@ -156,7 +157,7 @@ namespace Project.Frontend.Views.Coaching
             Subtitle = "Kế hoạch cá nhân và kế hoạch chung cho lớp",
             Unit = "kế hoạch",
             EmptyIcon = Icons.Edit,
-            Load = async () => (await UiScope.Run(s => s.Training.PlansOfCoachAsync(CoachId))).Select(p => new PlanRow { Entity = p }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Training.PlansOfCoachAsync(CoachId))).Select(p => new PlanRow { Entity = p }).ToList(),
             Search = r => $"{r.Title} {r.Goal} {r.Target} {r.Content}",
             SearchPlaceholder = "Tìm theo tiêu đề, học viên, lớp, nội dung...",
             DefaultSort = nameof(PlanRow.StartDate),
@@ -176,7 +177,7 @@ namespace Project.Frontend.Views.Coaching
                 new RowAction<PlanRow>(Icons.Delete, "Xóa", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Xóa kế hoạch?", $"Xóa kế hoạch \"{r.Title}\"?")) return false;
-                    await UiScope.Run(s => s.Training.DeletePlanAsync(r.Id));
+                    await ServiceScope.Run(s => s.Training.DeletePlanAsync(r.Id));
                     UiHost.Toast("Đã xóa kế hoạch.");
                     return true;
                 }) { Danger = true },
@@ -201,7 +202,7 @@ namespace Project.Frontend.Views.Coaching
             Subtitle = "Kết quả ghi sau mỗi buổi tập",
             Unit = "kết quả",
             EmptyIcon = Icons.Checklist,
-            Load = async () => (await UiScope.Run(s => s.Training.LogsAsync(coachId: CoachId))).Select(l => new LogRow { Entity = l }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Training.LogsAsync(coachId: CoachId))).Select(l => new LogRow { Entity = l }).ToList(),
             Search = r => $"{r.MemberName} {r.Exercises} {r.Notes} {r.Context}",
             SearchPlaceholder = "Tìm theo học viên, bài tập, ghi chú...",
             DefaultSort = nameof(LogRow.Date),
@@ -222,7 +223,7 @@ namespace Project.Frontend.Views.Coaching
                 new RowAction<LogRow>(Icons.Delete, "Xóa", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Xóa kết quả?", $"Xóa kết quả buổi tập ngày {r.DateText} của {r.MemberName}?")) return false;
-                    await UiScope.Run(s => s.Training.DeleteLogAsync(r.Id));
+                    await ServiceScope.Run(s => s.Training.DeleteLogAsync(r.Id));
                     UiHost.Toast("Đã xóa kết quả.");
                     return true;
                 }) { Danger = true },
@@ -237,7 +238,7 @@ namespace Project.Frontend.Views.Coaching
             Subtitle = "Điểm tiến độ (1–10) và nhận xét cho học viên",
             Unit = "đánh giá",
             EmptyIcon = Icons.Success,
-            Load = async () => (await UiScope.Run(s => s.Training.ReviewsAsync(coachId: CoachId))).Select(r => new ReviewRow { Entity = r }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Training.ReviewsAsync(coachId: CoachId))).Select(r => new ReviewRow { Entity = r }).ToList(),
             Search = r => $"{r.MemberName} {r.Comment}",
             DefaultSort = nameof(ReviewRow.Date),
             SortDirection = System.ComponentModel.ListSortDirection.Descending,
@@ -256,7 +257,7 @@ namespace Project.Frontend.Views.Coaching
                 new RowAction<ReviewRow>(Icons.Delete, "Xóa", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Xóa đánh giá?", $"Xóa đánh giá ngày {r.DateText} của {r.MemberName}?")) return false;
-                    await UiScope.Run(s => s.Training.DeleteReviewAsync(r.Id));
+                    await ServiceScope.Run(s => s.Training.DeleteReviewAsync(r.Id));
                     UiHost.Toast("Đã xóa đánh giá.");
                     return true;
                 }) { Danger = true },
