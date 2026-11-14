@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
-using SportsCenter.Core.Data;
-using SportsCenter.Core.Models;
+using SportsCenter.DAL.Data;
+using SportsCenter.DAL.Models;
 
-namespace SportsCenter.Core.Services
+namespace SportsCenter.BLL.Services
 {
     /// <summary>Băm mật khẩu PBKDF2-SHA256 có salt. Định dạng: pbkdf2$vòng-lặp$salt$hash (base64).</summary>
     public static class PasswordHasher
@@ -38,7 +38,7 @@ namespace SportsCenter.Core.Services
     public class AuthService
     {
         private readonly SportsCenterContext _db;
-        public AuthService(SportsCenterContext db) { _db = db; }
+        internal AuthService(SportsCenterContext db) { _db = db; }
 
         /// <summary>Đăng nhập; trả về null nếu sai thông tin. Tài khoản bị khóa ném ValidationException.</summary>
         public async Task<User?> LoginAsync(string username, string password)

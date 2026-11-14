@@ -1,49 +1,5 @@
-using SportsCenter.Core.Data;
-using SportsCenter.Core.Services;
-
 namespace Project.Frontend.Data
 {
-    /// <summary>
-    /// Phạm vi làm việc ngắn cho một thao tác giao diện: một DbContext mới + các service nghiệp vụ dùng chung (SportsCenter.Core).
-    /// Giao diện chỉ gọi service, không tự viết truy vấn CSDL.
-    /// </summary>
-    public sealed class UiScope : IDisposable
-    {
-        public SportsCenterContext Db { get; } = DbConfig.CreateContext();
-
-        private AuthService? _auth;
-        public AuthService Auth => _auth ??= new AuthService(Db);
-        public AccountService Accounts => new(Db);
-        public MemberService Members => new(Db);
-        public CoachService Coaches => new(Db);
-        public FacilityService Facilities => new(Db);
-        public ClassService Classes => new(Db);
-        public AttendanceService Attendance => new(Db);
-        public MembershipService Memberships => new(Db);
-        public PaymentService Payments => new(Db);
-        public ReportService Reports => new(Db);
-        public TrainingService Training => new(Db);
-        public NotificationService Notifications => new(Db);
-        public SupportService Support => new(Db);
-        public AuditService Audit => new(Db);
-        public AiContextService AiContext => new(Db);
-
-        /// <summary>Chạy một thao tác với scope mới.</summary>
-        public static async Task<T> Run<T>(Func<UiScope, Task<T>> work)
-        {
-            using var scope = new UiScope();
-            return await work(scope);
-        }
-
-        public static async Task Run(Func<UiScope, Task> work)
-        {
-            using var scope = new UiScope();
-            await work(scope);
-        }
-
-        public void Dispose() => Db.Dispose();
-    }
-
     public static class Formats
     {
         public static string Money(decimal value) => value.ToString("N0") + " ₫";

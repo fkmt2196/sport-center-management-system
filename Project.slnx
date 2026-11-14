@@ -1,4 +1,14 @@
 <Solution>
-  <Project Path="Project/Project.csproj" />
-  <Project Path="SportsCenter.Core/SportsCenter.Core.csproj" />
+  <Folder Name="/1 - Presentation/">
+    <Project Path="Project/Project.csproj" />
+  </Folder>
+  <Folder Name="/2 - Business Logic/">
+    <Project Path="SportsCenter.BLL/SportsCenter.BLL.csproj" />
+  </Folder>
+  <Folder Name="/3 - Data Access/">
+    <Project Path="SportsCenter.DAL/SportsCenter.DAL.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Project.ArchitectureTests/Project.ArchitectureTests.csproj" />
+  </Folder>
 </Solution>

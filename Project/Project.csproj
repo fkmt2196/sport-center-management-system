@@ -1,5 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- TẦNG 1 – PRESENTATION LAYER (WPF)
+       Chỉ tham chiếu BLL. Không được truy cập CSDL (DbContext là internal của DAL),
+       chỉ dùng entity trong SportsCenter.DAL.Models để hiển thị. -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -9,16 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SportsCenter.Core\SportsCenter.Core.csproj" />
+    <ProjectReference Include="..\SportsCenter.BLL\SportsCenter.BLL.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,3 +1,4 @@
+using SportsCenter.BLL;
 using System.Windows;
 using System.Windows.Controls;
 using Project.Frontend.Data;
@@ -56,12 +57,12 @@ namespace Project.Frontend.Controls
         }
 
         /// <summary>Hỏi xác nhận → chạy thao tác xóa qua service → toast kết quả. Trả về true nếu đã xóa.</summary>
-        public static async Task<bool> ConfirmDeleteAsync(string title, string message, Func<UiScope, Task> delete, string successMessage)
+        public static async Task<bool> ConfirmDeleteAsync(string title, string message, Func<ServiceScope, Task> delete, string successMessage)
         {
             if (!await UiHost.ConfirmAsync(title, message)) return false;
             try
             {
-                using var scope = new UiScope();
+                using var scope = new ServiceScope();
                 await delete(scope);
                 UiHost.Toast(successMessage, ToastKind.Success);
                 return true;

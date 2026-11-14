@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using SportsCenter.Core.Data;
-using SportsCenter.Core.Models;
+using SportsCenter.DAL.Data;
+using SportsCenter.DAL.Models;
 
-namespace SportsCenter.Core.Services
+namespace SportsCenter.BLL.Services
 {
     public class NotificationService
     {
         private readonly SportsCenterContext _db;
-        public NotificationService(SportsCenterContext db) { _db = db; }
+        internal NotificationService(SportsCenterContext db) { _db = db; }
 
         public Task<List<Notification>> ForUserAsync(int userId) =>
             _db.Notifications.AsNoTracking().Include(n => n.Sender)

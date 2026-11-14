@@ -2,20 +2,46 @@
 
 Ứng dụng WPF (.NET 8) quản lý trung tâm thể thao/tập luyện với 4 vai trò: **Quản lý**, **Huấn luyện viên**, **Thành viên**, **Lễ tân**.
 
-## Cấu trúc
+## Cấu trúc – kiến trúc 3 tầng
 
 ```
 Project.slnx
-├── SportsCenter.Core/        # Tầng dùng chung (mọi ứng dụng: WPF, web...)
-│   ├── Models/               # Entity: User, Member, Coach, Sport, Room, TrainingClass, ClassSession,
-│   │                         #   Enrollment, Attendance, CheckIn, MembershipPlan, Subscription, Payment,
-│   │                         #   TrainingPlan, WorkoutLog, ProgressReview, Notification, SupportRequest, AuditLog
-│   ├── Data/                 # SportsCenterContext (audit log tự động), DbConfig, DbSeeder, Migrations, AppSession
-│   ├── Services/             # Nghiệp vụ + kiểm tra quyền theo vai trò
-│   └── AI/                   # IAiCoachAssistant: ClaudeAiAssistant / TemplateAiAssistant (gợi ý mẫu)
-└── Project/                  # Ứng dụng WPF
-    └── Frontend/             # Themes, Controls (TablePage, Pager, BarChart...), Forms, Shell, Views theo vai trò
+├── Project/                      # 1. PRESENTATION (WPF) – chỉ tham chiếu SportsCenter.BLL
+│   └── Frontend/                 #    Themes, Controls (TablePage, Pager, BarChart...), Forms, Shell, Views theo vai trò
+├── SportsCenter.BLL/             # 2. BUSINESS LOGIC – chỉ tham chiếu SportsCenter.DAL
+│   ├── ServiceScope.cs           #    Điểm vào duy nhất cho giao diện: ServiceScope.Run(s => s.Members.ListAsync())
+│   │                             #    + DatabaseInitializer (migrate/seed khi khởi động)
+│   ├── Services/                 #    Nghiệp vụ + kiểm tra quyền theo vai trò (Authorization), PasswordHasher
+│   └── AI/                       #    IAiCoachAssistant: ClaudeAiAssistant / TemplateAiAssistant (gợi ý mẫu)
+├── SportsCenter.DAL/             # 3. DATA ACCESS – không tham chiếu tầng nào phía trên
+│   ├── Models/                   #    Entity: User, Member, Coach, Sport, Room, TrainingClass, ClassSession,
+│   │                             #      Enrollment, Attendance, CheckIn, MembershipPlan, Subscription, Payment,
+│   │                             #      TrainingPlan, WorkoutLog, ProgressReview, Notification, SupportRequest, AuditLog
+│   └── Data/                     #    SportsCenterContext (audit log tự động), DbConfig, DbSeeder, Migrations, AppSession
+└── Project.ArchitectureTests/    # Test kiến trúc (NetArchTest) giữ đúng ranh giới 3 tầng
 ```
+
+Luồng gọi: **Giao diện → `ServiceScope` (BLL) → Service → `SportsCenterContext` (DAL) → SQL Server**.
+
+### Quy tắc phân tầng
+
+Được **compiler** đảm bảo:
+
+- Hướng tham chiếu project: `Project → SportsCenter.BLL → SportsCenter.DAL` (DAL không thể gọi lên BLL/giao diện).
+- `SportsCenterContext`, `DbConfig`, `DbSeeder` là `internal` trong DAL, chỉ BLL thấy được (`InternalsVisibleTo`).
+  Giao diện không thể tự tạo DbContext hay truy vấn CSDL.
+- Constructor của các service là `internal`: giao diện chỉ lấy service qua `ServiceScope`.
+
+Được **`Project.ArchitectureTests`** kiểm tra thêm (`dotnet test Project.slnx`):
+
+- Giao diện không dùng `SportsCenter.DAL.Data`, `Microsoft.EntityFrameworkCore`, `Microsoft.Data.SqlClient`, `System.Data`.
+- BLL không dùng WPF (`System.Windows`, `Microsoft.Win32`) hay `Project.*`.
+- DAL không dùng BLL hay WPF; `Models` là entity thuần (không phụ thuộc DbContext/EF).
+- `AI` không phụ thuộc `Services`; DbContext/DbConfig/DbSeeder vẫn là `internal`; không service nào có constructor public nhận DbContext.
+
+Giao diện được dùng entity trong `SportsCenter.DAL.Models` để hiển thị/nhập liệu (tham chiếu bắc cầu qua BLL).
+Thêm chức năng mới: viết truy vấn trong service ở BLL, thêm thuộc tính vào `ServiceScope` nếu là service mới, rồi gọi
+từ giao diện qua `ServiceScope.Run(...)`.
 
 ## Yêu cầu
 
@@ -47,7 +73,7 @@ Thành viên mới cũng có thể tự **đăng ký tài khoản** ngay ở mà
 
 ## Trợ lý AI
 
-Tính năng AI nằm sau interface `IAiCoachAssistant` (`SportsCenter.Core/AI`):
+Tính năng AI nằm sau interface `IAiCoachAssistant` (`SportsCenter.BLL/AI`):
 
 - Có biến môi trường `ANTHROPIC_API_KEY` → gọi Claude (`claude-opus-5-5`) qua SDK chính thức của Anthropic,
   bật server-side fallback khi mô hình chính từ chối trả lời.
@@ -62,11 +88,11 @@ $env:ANTHROPIC_API_KEY = "sk-ant-..."   # rồi chạy lại ứng dụng
 
 ```powershell
 # Tạo migration mới sau khi đổi Models
-dotnet ef migrations add <Ten> --project SportsCenter.Core --startup-project Project --output-dir Data/Migrations
+dotnet ef migrations add <Ten> --project SportsCenter.DAL --output-dir Data/Migrations
 # Áp vào CSDL
-dotnet ef database update --project SportsCenter.Core --startup-project Project
+dotnet ef database update --project SportsCenter.DAL
 # Xóa CSDL để seed lại từ đầu (chạy app sẽ tạo lại)
-dotnet ef database drop --force --project SportsCenter.Core --startup-project Project
+dotnet ef database drop --force --project SportsCenter.DAL
 ```
 
 ## Chức năng theo vai trò

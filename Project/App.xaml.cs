@@ -1,8 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Markup;
-using Microsoft.EntityFrameworkCore;
-using SportsCenter.Core.Data;
+using SportsCenter.BLL;
 
 namespace Project
 {
@@ -50,9 +49,8 @@ namespace Project
             {
                 try
                 {
-                    using var context = DbConfig.CreateContext();
-                    context.Database.Migrate();   // đảm bảo schema mới nhất trước khi seed
-                    DbSeeder.Seed(context);       // dữ liệu mẫu khi CSDL còn trống
+                    // Áp migration mới nhất + seed dữ liệu mẫu khi CSDL còn trống (qua BLL, giao diện không chạm CSDL).
+                    DatabaseInitializer.Initialize(seedSampleData: true);
                 }
                 catch (Exception ex)
                 {

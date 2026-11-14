@@ -1,12 +1,12 @@
-using SportsCenter.Core.Models;
-using SportsCenter.Core.Services;
+using SportsCenter.DAL.Models;
+using SportsCenter.BLL.Services;
 
 namespace Project.Frontend.Data
 {
     /// <summary>Dòng hiển thị cho các bảng (chuỗi đã định dạng sẵn + giá trị gốc để sắp xếp).</summary>
     public static class Labels
     {
-        public static string Gender(Gender g) => g switch { SportsCenter.Core.Models.Gender.Male => "Nam", SportsCenter.Core.Models.Gender.Female => "Nữ", _ => "Khác" };
+        public static string Gender(Gender g) => g switch { SportsCenter.DAL.Models.Gender.Male => "Nam", SportsCenter.DAL.Models.Gender.Female => "Nữ", _ => "Khác" };
         public static string Level(FitnessLevel l) => l switch { FitnessLevel.Beginner => "Mới bắt đầu", FitnessLevel.Intermediate => "Trung bình", _ => "Nâng cao" };
         public static string Attendance(AttendanceStatus s) => Project.Frontend.Controls.StatusBadge.Describe("attendance", s.ToString()).Label;
 

@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace SportsCenter.Core.AI
+namespace SportsCenter.BLL.AI
 {
     /// <summary>
     /// Trợ lý "ngoại tuyến": sinh gợi ý mẫu theo quy tắc (mục tiêu, trình độ, chấn thương, lịch sử tập).

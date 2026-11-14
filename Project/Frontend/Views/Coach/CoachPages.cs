@@ -1,3 +1,4 @@
+using SportsCenter.BLL;
 using System.Windows;
 using Project.Frontend.Data;
 using Project.Frontend.Forms;
@@ -11,9 +12,9 @@ namespace Project.Frontend.Views.Coaching
         public static async Task<bool> LogForSessionAsync(SessionRow session)
         {
             if (Me.CoachId is not int coachId) return false;
-            var roster = await UiScope.Run(s => s.Attendance.RosterAsync(session.Id));
+            var roster = await ServiceScope.Run(s => s.Attendance.RosterAsync(session.Id));
             if (roster.Count == 0) { UiHost.Toast("Buổi tập chưa có học viên.", ToastKind.Info); return false; }
-            var first = roster.FirstOrDefault(r => r.Status is SportsCenter.Core.Models.AttendanceStatus.Present or SportsCenter.Core.Models.AttendanceStatus.Late) ?? roster[0];
+            var first = roster.FirstOrDefault(r => r.Status is SportsCenter.DAL.Models.AttendanceStatus.Present or SportsCenter.DAL.Models.AttendanceStatus.Late) ?? roster[0];
             return await TrainingForms.LogAsync(coachId, null, first.MemberId, session.Id, session.Start.Date);
         }
     }

@@ -1,10 +1,10 @@
+using SportsCenter.BLL;
 using System.Text.RegularExpressions;
 using Project.Frontend.Controls;
 using Project.Frontend.Data;
 using Project.Frontend.Shell;
-using SportsCenter.Core.Data;
-using SportsCenter.Core.Models;
-using SportsCenter.Core.Services;
+using SportsCenter.DAL.Models;
+using SportsCenter.BLL.Services;
 
 namespace Project.Frontend.Forms
 {
@@ -43,12 +43,12 @@ namespace Project.Frontend.Forms
             { DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday };
 
         public static async Task<List<(string, object)>> MemberOptions() =>
-            (await UiScope.Run(s => s.Members.ListAsync()))
+            (await ServiceScope.Run(s => s.Members.ListAsync()))
                 .Select(m => ($"{m.User!.FullName} ({m.User.Username} · {m.User.Phone})", (object)m.Id)).ToList();
 
         public static async Task<List<(string, object)>> CoachOptions(bool withNone)
         {
-            var list = (await UiScope.Run(s => s.Coaches.ListAsync()))
+            var list = (await ServiceScope.Run(s => s.Coaches.ListAsync()))
                 .Where(c => c.User!.IsActive)
                 .Select(c => ($"{c.User!.FullName} · {c.Specialty}{(c.IsAvailable ? "" : " (tạm ngưng)")}", (object)c.Id)).ToList();
             if (withNone) list.Insert(0, ("(Chưa phân công)", 0));
@@ -82,7 +82,7 @@ namespace Project.Frontend.Forms
             var dialog = new FormDialog(isNew ? "Tạo tài khoản" : "Sửa tài khoản & phân quyền", isNew ? "Tạo tài khoản cho nhân viên, HLV hoặc thành viên." : existing!.Username,
                 Icons.Contact, fields, async f =>
                 {
-                    await UiScope.Run(async s =>
+                    await ServiceScope.Run(async s =>
                     {
                         if (isNew) await s.Accounts.CreateAsync(f.Text("Username"), f.Text("Password"), f.Text("FullName"), f.Text("Phone"), f.Text("Email"), (UserRole)f.Get("Role")!);
                         else await s.Accounts.UpdateAsync(existing!.Id, f.Text("FullName"), f.Text("Phone"), f.Text("Email"), (UserRole)f.Get("Role")!, f.Get("IsActive") is true);
@@ -100,7 +100,7 @@ namespace Project.Frontend.Forms
             {
                 new FormField("Password", "Mật khẩu mới", FieldKind.Password) { Required = true, Validate = Rules.Password },
                 new FormField("Confirm", "Nhập lại mật khẩu", FieldKind.Password) { Required = true, Validate = Rules.SameAs("Password") },
-            }, async f => { await UiScope.Run(s => s.Accounts.ResetPasswordAsync(user.Id, f.Text("Password"))); return true; }, "Đặt lại");
+            }, async f => { await ServiceScope.Run(s => s.Accounts.ResetPasswordAsync(user.Id, f.Text("Password"))); return true; }, "Đặt lại");
             if (!await UiHost.ShowDialogAsync(dialog)) return false;
             UiHost.Toast($"Đã đặt lại mật khẩu cho {user.Username}.");
             return true;
@@ -113,7 +113,7 @@ namespace Project.Frontend.Forms
                 new FormField("Current", "Mật khẩu hiện tại", FieldKind.Password) { Required = true, Wide = true },
                 new FormField("Password", "Mật khẩu mới", FieldKind.Password) { Required = true, Validate = Rules.Password },
                 new FormField("Confirm", "Nhập lại mật khẩu mới", FieldKind.Password) { Required = true, Validate = Rules.SameAs("Password") },
-            }, async f => { await UiScope.Run(s => s.Auth.ChangePasswordAsync(userId, f.Text("Current"), f.Text("Password"))); return true; }, "Đổi mật khẩu");
+            }, async f => { await ServiceScope.Run(s => s.Auth.ChangePasswordAsync(userId, f.Text("Current"), f.Text("Password"))); return true; }, "Đổi mật khẩu");
             if (!await UiHost.ShowDialogAsync(dialog)) return false;
             UiHost.Toast("Đã đổi mật khẩu.");
             return true;
@@ -161,7 +161,7 @@ namespace Project.Frontend.Forms
                 {
                     var input = new MemberInput(f.Text("FullName"), f.Text("Phone"), f.Text("Email"), (Gender)f.Get("Gender")!, f.Value<DateTime>("Dob"),
                         f.Value<double>("Height"), f.Value<double>("Weight"), (FitnessLevel)f.Get("Level")!, f.Text("Goals"), f.Text("Health"));
-                    await UiScope.Run(async s =>
+                    await ServiceScope.Run(async s =>
                     {
                         if (isNew) await s.Members.RegisterAsync(f.Text("Username"), f.Text("Password"), input);
                         else await s.Members.UpdateAsync(existing!.Id, input);
@@ -198,7 +198,7 @@ namespace Project.Frontend.Forms
                 {
                     var input = new CoachInput(f.Text("FullName"), f.Text("Phone"), f.Text("Email"), f.Text("Specialty"), f.Text("Certs"), f.Text("Bio"),
                         f.Value<int>("Years") ?? 0, f.Get("Available") is true);
-                    await UiScope.Run(async s =>
+                    await ServiceScope.Run(async s =>
                     {
                         if (isNew) await s.Coaches.CreateAsync(f.Text("Username"), f.Text("Password"), input);
                         else await s.Coaches.UpdateAsync(existing!.Id, input);
@@ -225,7 +225,7 @@ namespace Project.Frontend.Forms
                 new FormField("Desc", "Mô tả", FieldKind.Multiline) { Wide = true, MaxLength = 500, Value = existing?.Description },
             }, async f =>
             {
-                await UiScope.Run(s => s.Facilities.SaveSportAsync(new Sport { Id = existing?.Id ?? 0, Name = f.Text("Name"), Description = f.Text("Desc"), IsActive = f.Get("Active") is true }));
+                await ServiceScope.Run(s => s.Facilities.SaveSportAsync(new Sport { Id = existing?.Id ?? 0, Name = f.Text("Name"), Description = f.Text("Desc"), IsActive = f.Get("Active") is true }));
                 return true;
             });
             if (!await UiHost.ShowDialogAsync(dialog)) return false;
@@ -244,7 +244,7 @@ namespace Project.Frontend.Forms
                 new FormField("Equipment", "Trang thiết bị", FieldKind.Multiline) { Wide = true, MaxLength = 500, Value = existing?.Equipment },
             }, async f =>
             {
-                await UiScope.Run(s => s.Facilities.SaveRoomAsync(new Room
+                await ServiceScope.Run(s => s.Facilities.SaveRoomAsync(new Room
                 {
                     Id = existing?.Id ?? 0, Name = f.Text("Name"), Capacity = f.Value<int>("Capacity") ?? 0, Location = f.Text("Location"),
                     Equipment = f.Text("Equipment"), IsActive = f.Get("Active") is true
@@ -269,7 +269,7 @@ namespace Project.Frontend.Forms
                 new FormField("Desc", "Mô tả quyền lợi", FieldKind.Multiline) { Wide = true, MaxLength = 500, Value = existing?.Description },
             }, async f =>
             {
-                await UiScope.Run(s => s.Memberships.SavePlanAsync(new MembershipPlan
+                await ServiceScope.Run(s => s.Memberships.SavePlanAsync(new MembershipPlan
                 {
                     Id = existing?.Id ?? 0, Name = f.Text("Name"), Price = f.Value<decimal>("Price") ?? 0, DurationDays = f.Value<int>("Days") ?? 0,
                     IncludesGroupClasses = f.Get("Classes") is true, IsActive = f.Get("Active") is true, Description = f.Text("Desc")
@@ -289,7 +289,7 @@ namespace Project.Frontend.Forms
     {
         public static async Task<bool> ClassAsync(TrainingClass? existing, bool assignOnly = false)
         {
-            var sports = (await UiScope.Run(s => s.Facilities.SportsAsync())).Where(s => s.IsActive || s.Id == existing?.SportId).Select(s => (s.Name, (object)s.Id)).ToList();
+            var sports = (await ServiceScope.Run(s => s.Facilities.SportsAsync())).Where(s => s.IsActive || s.Id == existing?.SportId).Select(s => (s.Name, (object)s.Id)).ToList();
             var coaches = await Rules.CoachOptions(withNone: true);
             var isNew = existing == null;
             var fields = new List<FormField>();
@@ -325,7 +325,7 @@ namespace Project.Frontend.Forms
                         EndDate = f.Value<DateTime>("End"), Status = (ClassStatus)f.Get("Status")!, Description = f.Text("Desc")
                     };
                     cls.CoachId = coachId == 0 ? null : coachId;
-                    await UiScope.Run(s => s.Classes.SaveAsync(cls));
+                    await ServiceScope.Run(s => s.Classes.SaveAsync(cls));
                     return true;
                 }, assignOnly ? "Phân công" : isNew ? "Thêm lớp" : "Lưu thay đổi");
             if (!await UiHost.ShowDialogAsync(dialog)) return false;
@@ -335,7 +335,7 @@ namespace Project.Frontend.Forms
 
         public static async Task<bool> GenerateSessionsAsync(TrainingClass cls)
         {
-            var rooms = (await UiScope.Run(s => s.Facilities.RoomsAsync())).Where(r => r.IsActive).Select(r => ($"{r.Name} ({r.Capacity} người)", (object)r.Id)).ToList();
+            var rooms = (await ServiceScope.Run(s => s.Facilities.RoomsAsync())).Where(r => r.IsActive).Select(r => ($"{r.Name} ({r.Capacity} người)", (object)r.Id)).ToList();
             var from = cls.StartDate > DateTime.Today ? cls.StartDate : DateTime.Today;
             var dialog = new FormDialog("Xếp lịch theo tuần", cls.Name, Icons.Calendar, new[]
             {
@@ -350,7 +350,7 @@ namespace Project.Frontend.Forms
             }, async f =>
             {
                 var days = ((List<object>)f.Get("Days")!).Cast<DayOfWeek>().ToList();
-                var (created, skipped) = await UiScope.Run(s => s.Classes.GenerateSessionsAsync(cls.Id, Rules.Id(f.Get("Room")), days,
+                var (created, skipped) = await ServiceScope.Run(s => s.Classes.GenerateSessionsAsync(cls.Id, Rules.Id(f.Get("Room")), days,
                     f.Value<TimeSpan>("Start")!.Value, f.Value<TimeSpan>("End")!.Value, f.Value<DateTime>("From")!.Value, f.Value<DateTime>("To")!.Value));
                 UiHost.Toast(skipped == 0 ? $"Đã tạo {created} ca học." : $"Đã tạo {created} ca học, bỏ qua {skipped} ca trùng phòng.", skipped == 0 ? ToastKind.Success : ToastKind.Warning);
                 return true;
@@ -360,9 +360,9 @@ namespace Project.Frontend.Forms
 
         public static async Task<bool> SessionAsync(SessionRow? existing)
         {
-            var rooms = (await UiScope.Run(s => s.Facilities.RoomsAsync())).Where(r => r.IsActive || r.Id == existing?.Entity.RoomId).Select(r => (r.Name, (object)r.Id)).ToList();
+            var rooms = (await ServiceScope.Run(s => s.Facilities.RoomsAsync())).Where(r => r.IsActive || r.Id == existing?.Entity.RoomId).Select(r => (r.Name, (object)r.Id)).ToList();
             var classes = existing == null
-                ? (await UiScope.Run(s => s.Classes.ListAsync())).Where(c => c.Class.Status == ClassStatus.Open).Select(c => (c.Class.Name, (object)c.Class.Id)).ToList()
+                ? (await ServiceScope.Run(s => s.Classes.ListAsync())).Where(c => c.Class.Status == ClassStatus.Open).Select(c => (c.Class.Name, (object)c.Class.Id)).ToList()
                 : new List<(string, object)>();
             var e = existing?.Entity;
             var fields = new List<FormField>();
@@ -379,7 +379,7 @@ namespace Project.Frontend.Forms
             var dialog = new FormDialog(existing == null ? "Thêm ca học" : "Đổi lịch ca học", existing?.ClassName ?? "Một buổi tập cụ thể của lớp.", Icons.Calendar, fields, async f =>
             {
                 var date = f.Value<DateTime>("Date")!.Value.Date;
-                await UiScope.Run(s => s.Classes.SaveSessionAsync(new ClassSession
+                await ServiceScope.Run(s => s.Classes.SaveSessionAsync(new ClassSession
                 {
                     Id = e?.Id ?? 0, ClassId = e?.ClassId ?? Rules.Id(f.Get("Class")), RoomId = Rules.Id(f.Get("Room")),
                     StartTime = date + f.Value<TimeSpan>("Start")!.Value, EndTime = date + f.Value<TimeSpan>("End")!.Value,
@@ -398,7 +398,7 @@ namespace Project.Frontend.Forms
             {
                 new FormField("Reason", "Lý do hủy", FieldKind.Multiline) { Required = true, Wide = true, MaxLength = 300, Placeholder = "vd. HLV ốm, bảo trì thiết bị",
                     Hint = "Lý do sẽ được gửi kèm thông báo tới thành viên của lớp." },
-            }, async f => { await UiScope.Run(s => s.Classes.CancelSessionAsync(row.Id, f.Text("Reason"))); return true; }, "Hủy ca & thông báo");
+            }, async f => { await ServiceScope.Run(s => s.Classes.CancelSessionAsync(row.Id, f.Text("Reason"))); return true; }, "Hủy ca & thông báo");
             if (!await UiHost.ShowDialogAsync(dialog)) return false;
             UiHost.Toast("Đã hủy ca học và gửi thông báo cho thành viên.");
             return true;
@@ -413,13 +413,13 @@ namespace Project.Frontend.Forms
         /// <summary>Đăng ký/gia hạn gói. memberId null: chọn thành viên. selfService: thành viên tự mua (online).</summary>
         public static async Task<Payment?> SubscribeAsync(int? memberId, bool selfService = false, int? planId = null)
         {
-            var plans = (await UiScope.Run(s => s.Memberships.PlansAsync(activeOnly: true)))
+            var plans = (await ServiceScope.Run(s => s.Memberships.PlansAsync(activeOnly: true)))
                 .Select(p => ($"{p.Name} – {p.Price:N0} ₫ / {p.DurationDays} ngày", (object)p.Id)).ToList();
             var members = memberId == null ? await Rules.MemberOptions() : null;
             string? hint = null;
             if (memberId is int mid)
             {
-                var m = await UiScope.Run(s => s.Members.GetAsync(mid));
+                var m = await ServiceScope.Run(s => s.Members.GetAsync(mid));
                 var end = m == null ? null : MemberService.MembershipEnd(m);
                 hint = end.HasValue && end >= DateTime.Today ? $"Gói hiện tại còn hạn đến {end:dd/MM/yyyy}: gói mới sẽ nối tiếp từ {end.Value.AddDays(1):dd/MM/yyyy}." : "Gói mới bắt đầu từ hôm nay.";
             }
@@ -437,7 +437,7 @@ namespace Project.Frontend.Forms
                 {
                     var id = memberId ?? Rules.Id(f.Get("Member"));
                     var method = selfService ? PaymentMethod.Online : (PaymentMethod)f.Get("Method")!;
-                    (_, payment) = await UiScope.Run(s => s.Memberships.SubscribeAsync(id, Rules.Id(f.Get("Plan")), method, selfService ? "" : f.Text("Note")));
+                    (_, payment) = await ServiceScope.Run(s => s.Memberships.SubscribeAsync(id, Rules.Id(f.Get("Plan")), method, selfService ? "" : f.Text("Note")));
                     return true;
                 }, selfService ? "Thanh toán" : "Ghi nhận & lập hóa đơn");
             if (!await UiHost.ShowDialogAsync(dialog)) return null;
@@ -448,7 +448,7 @@ namespace Project.Frontend.Forms
         /// <summary>Đăng ký lớp (tự đăng ký hoặc đăng ký hộ). Lớp có học phí cần chọn hình thức thanh toán.</summary>
         public static async Task<bool> EnrollAsync(int? memberId, int? classId, bool selfService = false)
         {
-            var classes = (await UiScope.Run(s => s.Classes.ListAsync()))
+            var classes = (await ServiceScope.Run(s => s.Classes.ListAsync()))
                 .Where(c => c.Class.Status == ClassStatus.Open && (c.Class.EndDate == null || c.Class.EndDate >= DateTime.Today))
                 .OrderBy(c => c.Class.Name)
                 .Select(c => ($"{c.Class.Name} · {(c.Class.Fee == 0 ? "gồm trong gói" : $"{c.Class.Fee:N0} ₫")} · còn {Math.Max(0, c.Class.Capacity - c.Enrolled)} chỗ", (object)c.Class.Id)).ToList();
@@ -464,7 +464,7 @@ namespace Project.Frontend.Forms
             var dialog = new FormDialog(selfService ? "Đăng ký lớp" : "Đăng ký lớp cho thành viên", "Cần có gói thành viên còn hạn.", Icons.Library, fields, async f =>
             {
                 var id = memberId ?? Rules.Id(f.Get("Member"));
-                await UiScope.Run(s => s.Classes.EnrollAsync(id, Rules.Id(f.Get("Class")), (PaymentMethod?)f.Get("Method")));
+                await ServiceScope.Run(s => s.Classes.EnrollAsync(id, Rules.Id(f.Get("Class")), (PaymentMethod?)f.Get("Method")));
                 return true;
             }, "Đăng ký");
             if (!await UiHost.ShowDialogAsync(dialog)) return false;
@@ -483,7 +483,7 @@ namespace Project.Frontend.Forms
             Payment? payment = null;
             var dialog = new FormDialog("Ghi nhận thanh toán", "Khoản thu khác ngoài gói và học phí lớp.", Icons.Money, fields, async f =>
             {
-                payment = await UiScope.Run(s => s.Payments.RecordAsync(memberId ?? Rules.Id(f.Get("Member")), f.Value<decimal>("Amount")!.Value, (PaymentMethod)f.Get("Method")!, f.Text("Note")));
+                payment = await ServiceScope.Run(s => s.Payments.RecordAsync(memberId ?? Rules.Id(f.Get("Member")), f.Value<decimal>("Amount")!.Value, (PaymentMethod)f.Get("Method")!, f.Text("Note")));
                 return true;
             }, "Ghi nhận");
             if (!await UiHost.ShowDialogAsync(dialog)) return null;
@@ -505,11 +505,11 @@ namespace Project.Frontend.Forms
             }, async f =>
             {
                 var memberIdValue = Rules.Id(f.Get("Member"));
-                await UiScope.Run(s => s.Support.SaveAsync(new SupportRequest
+                await ServiceScope.Run(s => s.Support.SaveAsync(new SupportRequest
                 {
                     Id = existing?.Id ?? 0, MemberId = memberIdValue == 0 ? null : memberIdValue, Subject = f.Text("Subject"),
                     Description = f.Text("Desc"), Status = (SupportStatus)f.Get("Status")!, Response = f.Text("Response"),
-                    CreatedByUserId = existing?.CreatedByUserId ?? AppSession.UserId ?? 0
+                    CreatedByUserId = existing?.CreatedByUserId ?? Me.User.Id
                 }));
                 return true;
             });
@@ -526,9 +526,9 @@ namespace Project.Frontend.Forms
     {
         private static async Task<(List<(string, object)> Members, List<(string, object)> Classes)> CoachTargets(int coachId)
         {
-            var members = (await UiScope.Run(s => s.Coaches.MyMembersAsync(coachId)))
+            var members = (await ServiceScope.Run(s => s.Coaches.MyMembersAsync(coachId)))
                 .Select(x => ($"{x.Member.User!.FullName} ({string.Join(", ", x.Classes)})", (object)x.Member.Id)).ToList();
-            var classes = (await UiScope.Run(s => s.Classes.ListAsync(coachId))).Select(c => (c.Class.Name, (object)c.Class.Id)).ToList();
+            var classes = (await ServiceScope.Run(s => s.Classes.ListAsync(coachId))).Select(c => (c.Class.Name, (object)c.Class.Id)).ToList();
             return (members, classes);
         }
 
@@ -552,7 +552,7 @@ namespace Project.Frontend.Forms
             }, async f =>
             {
                 var m = Rules.Id(f.Get("Member")); var c = Rules.Id(f.Get("Class"));
-                await UiScope.Run(s => s.Training.SavePlanAsync(new TrainingPlan
+                await ServiceScope.Run(s => s.Training.SavePlanAsync(new TrainingPlan
                 {
                     Id = existing?.Id ?? 0, CoachId = existing?.CoachId ?? coachId, MemberId = m == 0 ? null : m, ClassId = c == 0 ? null : c,
                     Title = f.Text("Title"), Goal = f.Text("Goal"), Content = f.Text("Content"), StartDate = f.Value<DateTime>("Start")!.Value, EndDate = f.Value<DateTime>("End")
@@ -579,7 +579,7 @@ namespace Project.Frontend.Forms
                 new FormField("Notes", "Nhận xét nhanh", FieldKind.Text) { MaxLength = 500, Value = existing?.Notes },
             }, async f =>
             {
-                await UiScope.Run(s => s.Training.SaveLogAsync(new WorkoutLog
+                await ServiceScope.Run(s => s.Training.SaveLogAsync(new WorkoutLog
                 {
                     Id = existing?.Id ?? 0, CoachId = existing?.CoachId ?? coachId, MemberId = Rules.Id(f.Get("Member")), SessionId = existing?.SessionId ?? sessionId,
                     Date = f.Value<DateTime>("Date")!.Value, DurationMinutes = f.Value<int>("Duration"), Exercises = f.Text("Exercises"),
@@ -604,7 +604,7 @@ namespace Project.Frontend.Forms
                     Placeholder = "Điểm mạnh, điểm cần cải thiện, mục tiêu tiếp theo" },
             }, async f =>
             {
-                await UiScope.Run(s => s.Training.SaveReviewAsync(new ProgressReview
+                await ServiceScope.Run(s => s.Training.SaveReviewAsync(new ProgressReview
                 {
                     Id = existing?.Id ?? 0, CoachId = existing?.CoachId ?? coachId, MemberId = Rules.Id(f.Get("Member")),
                     Date = f.Value<DateTime>("Date")!.Value, Score = f.Value<int>("Score") ?? 0, Comment = f.Text("Comment")
@@ -620,10 +620,10 @@ namespace Project.Frontend.Forms
         public static async Task<bool> SendNoticeAsync(int? coachId, int? presetMemberId = null, int? presetClassId = null, NotificationType type = NotificationType.Homework)
         {
             var targets = new List<(string, object)>();
-            var classes = await UiScope.Run(s => s.Classes.ListAsync(coachId));
+            var classes = await ServiceScope.Run(s => s.Classes.ListAsync(coachId));
             targets.AddRange(classes.Where(c => c.Class.Status == ClassStatus.Open).Select(c => ($"Cả lớp: {c.Class.Name} ({c.Enrolled} học viên)", (object)$"c:{c.Class.Id}")));
             if (coachId is int cid)
-                targets.AddRange((await UiScope.Run(s => s.Coaches.MyMembersAsync(cid))).Select(x => ($"Học viên: {x.Member.User!.FullName}", (object)$"m:{x.Member.Id}")));
+                targets.AddRange((await ServiceScope.Run(s => s.Coaches.MyMembersAsync(cid))).Select(x => ($"Học viên: {x.Member.User!.FullName}", (object)$"m:{x.Member.Id}")));
             else
                 targets.AddRange((await Rules.MemberOptions()).Select(m => ($"Thành viên: {m.Item1}", (object)$"m:{m.Item2}")));
             var preset = presetMemberId != null ? $"m:{presetMemberId}" : presetClassId != null ? $"c:{presetClassId}" : null;
@@ -640,7 +640,7 @@ namespace Project.Frontend.Forms
                 var target = (string)f.Get("Target")!;
                 var id = int.Parse(target[2..]);
                 var t = (NotificationType)f.Get("Type")!;
-                var count = await UiScope.Run(async s =>
+                var count = await ServiceScope.Run(async s =>
                 {
                     if (target.StartsWith("c:")) return await s.Notifications.SendToClassAsync(id, f.Text("Title"), f.Text("Body"), t);
                     await s.Notifications.SendToMemberAsync(id, f.Text("Title"), f.Text("Body"), t);

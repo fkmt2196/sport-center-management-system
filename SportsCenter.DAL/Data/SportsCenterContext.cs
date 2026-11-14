@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using SportsCenter.Core.Models;
+using SportsCenter.DAL.Models;
 
-namespace SportsCenter.Core.Data
+namespace SportsCenter.DAL.Data
 {
-    public class SportsCenterContext : DbContext
+    internal class SportsCenterContext : DbContext
     {
         public SportsCenterContext(DbContextOptions<SportsCenterContext> options) : base(options) { }
 

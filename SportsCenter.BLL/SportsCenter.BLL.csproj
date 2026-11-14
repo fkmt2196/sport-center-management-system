@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- TẦNG 2 – BUSINESS LOGIC LAYER (BLL)
+       Services (nghiệp vụ + kiểm tra quyền), AI, ServiceScope (điểm vào cho giao diện).
+       Chỉ tham chiếu DAL; không tham chiếu WPF/giao diện. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SportsCenter.BLL</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Project.ArchitectureTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Anthropic" Version="13.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SportsCenter.DAL\SportsCenter.DAL.csproj" />
+  </ItemGroup>
+
+</Project>

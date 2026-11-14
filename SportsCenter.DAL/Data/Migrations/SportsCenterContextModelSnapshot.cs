@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SportsCenter.Core.Data;
+using SportsCenter.DAL.Data;
 
 #nullable disable
 
-namespace SportsCenter.Core.Data.Migrations
+namespace SportsCenter.DAL.Data.Migrations
 {
     [DbContext(typeof(SportsCenterContext))]
-    [Migration("20261113173229_InitialSportsCenter")]
-    partial class InitialSportsCenter
+    partial class SportsCenterContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +22,7 @@ namespace SportsCenter.Core.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Attendance", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Attendance", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -62,7 +59,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Attendances");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.AuditLog", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.AuditLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -108,7 +105,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("AuditLogs");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.CheckIn", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.CheckIn", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -139,7 +136,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("CheckIns");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.ClassSession", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.ClassSession", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,7 +177,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("ClassSessions", (string)null);
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Coach", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Coach", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -223,7 +220,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Coaches");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Enrollment", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Enrollment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -258,7 +255,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Enrollments");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Member", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Member", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -309,7 +306,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Members");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.MembershipPlan", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.MembershipPlan", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -345,7 +342,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("MembershipPlans", (string)null);
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Notification", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -389,7 +386,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Payment", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Payment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -454,7 +451,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.ProgressReview", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.ProgressReview", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -488,7 +485,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("ProgressReviews");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Room", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Room", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -525,7 +522,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Sport", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Sport", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -554,7 +551,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Sports");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Subscription", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Subscription", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -600,7 +597,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Subscriptions");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.SupportRequest", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.SupportRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -649,7 +646,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("SupportRequests");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.TrainingClass", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.TrainingClass", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -705,7 +702,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Classes", (string)null);
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.TrainingPlan", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.TrainingPlan", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -757,7 +754,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("TrainingPlans");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.User", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -812,7 +809,7 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.WorkoutLog", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.WorkoutLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -859,15 +856,15 @@ namespace SportsCenter.Core.Data.Migrations
                     b.ToTable("WorkoutLogs");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Attendance", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Attendance", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.Member", "Member")
+                    b.HasOne("SportsCenter.DAL.Models.Member", "Member")
                         .WithMany("Attendances")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsCenter.Core.Models.ClassSession", "Session")
+                    b.HasOne("SportsCenter.DAL.Models.ClassSession", "Session")
                         .WithMany("Attendances")
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -878,9 +875,9 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Session");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.CheckIn", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.CheckIn", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.Member", "Member")
+                    b.HasOne("SportsCenter.DAL.Models.Member", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -889,15 +886,15 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.ClassSession", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.ClassSession", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.TrainingClass", "Class")
+                    b.HasOne("SportsCenter.DAL.Models.TrainingClass", "Class")
                         .WithMany("Sessions")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsCenter.Core.Models.Room", "Room")
+                    b.HasOne("SportsCenter.DAL.Models.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -908,26 +905,26 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Coach", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Coach", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.User", "User")
+                    b.HasOne("SportsCenter.DAL.Models.User", "User")
                         .WithOne("Coach")
-                        .HasForeignKey("SportsCenter.Core.Models.Coach", "UserId")
+                        .HasForeignKey("SportsCenter.DAL.Models.Coach", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Enrollment", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Enrollment", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.TrainingClass", "Class")
+                    b.HasOne("SportsCenter.DAL.Models.TrainingClass", "Class")
                         .WithMany("Enrollments")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportsCenter.Core.Models.Member", "Member")
+                    b.HasOne("SportsCenter.DAL.Models.Member", "Member")
                         .WithMany("Enrollments")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -938,25 +935,25 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Member", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Member", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.User", "User")
+                    b.HasOne("SportsCenter.DAL.Models.User", "User")
                         .WithOne("Member")
-                        .HasForeignKey("SportsCenter.Core.Models.Member", "UserId")
+                        .HasForeignKey("SportsCenter.DAL.Models.Member", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Notification", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Notification", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.User", "Sender")
+                    b.HasOne("SportsCenter.DAL.Models.User", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderUserId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SportsCenter.Core.Models.User", "User")
+                    b.HasOne("SportsCenter.DAL.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -967,25 +964,25 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Payment", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Payment", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.Enrollment", "Enrollment")
+                    b.HasOne("SportsCenter.DAL.Models.Enrollment", "Enrollment")
                         .WithMany()
                         .HasForeignKey("EnrollmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SportsCenter.Core.Models.Member", "Member")
+                    b.HasOne("SportsCenter.DAL.Models.Member", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsCenter.Core.Models.User", "ReceivedBy")
+                    b.HasOne("SportsCenter.DAL.Models.User", "ReceivedBy")
                         .WithMany()
                         .HasForeignKey("ReceivedByUserId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SportsCenter.Core.Models.Subscription", "Subscription")
+                    b.HasOne("SportsCenter.DAL.Models.Subscription", "Subscription")
                         .WithMany()
                         .HasForeignKey("SubscriptionId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -999,15 +996,15 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Subscription");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.ProgressReview", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.ProgressReview", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.Coach", "Coach")
+                    b.HasOne("SportsCenter.DAL.Models.Coach", "Coach")
                         .WithMany()
                         .HasForeignKey("CoachId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsCenter.Core.Models.Member", "Member")
+                    b.HasOne("SportsCenter.DAL.Models.Member", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1018,15 +1015,15 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Subscription", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Subscription", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.Member", "Member")
+                    b.HasOne("SportsCenter.DAL.Models.Member", "Member")
                         .WithMany("Subscriptions")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsCenter.Core.Models.MembershipPlan", "Plan")
+                    b.HasOne("SportsCenter.DAL.Models.MembershipPlan", "Plan")
                         .WithMany()
                         .HasForeignKey("PlanId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1037,15 +1034,15 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Plan");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.SupportRequest", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.SupportRequest", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.User", "CreatedBy")
+                    b.HasOne("SportsCenter.DAL.Models.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsCenter.Core.Models.Member", "Member")
+                    b.HasOne("SportsCenter.DAL.Models.Member", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -1055,14 +1052,14 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.TrainingClass", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.TrainingClass", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.Coach", "Coach")
+                    b.HasOne("SportsCenter.DAL.Models.Coach", "Coach")
                         .WithMany("Classes")
                         .HasForeignKey("CoachId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SportsCenter.Core.Models.Sport", "Sport")
+                    b.HasOne("SportsCenter.DAL.Models.Sport", "Sport")
                         .WithMany("Classes")
                         .HasForeignKey("SportId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1073,20 +1070,20 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Sport");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.TrainingPlan", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.TrainingPlan", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.TrainingClass", "Class")
+                    b.HasOne("SportsCenter.DAL.Models.TrainingClass", "Class")
                         .WithMany()
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SportsCenter.Core.Models.Coach", "Coach")
+                    b.HasOne("SportsCenter.DAL.Models.Coach", "Coach")
                         .WithMany()
                         .HasForeignKey("CoachId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsCenter.Core.Models.Member", "Member")
+                    b.HasOne("SportsCenter.DAL.Models.Member", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -1098,20 +1095,20 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.WorkoutLog", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.WorkoutLog", b =>
                 {
-                    b.HasOne("SportsCenter.Core.Models.Coach", "Coach")
+                    b.HasOne("SportsCenter.DAL.Models.Coach", "Coach")
                         .WithMany()
                         .HasForeignKey("CoachId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("SportsCenter.Core.Models.Member", "Member")
+                    b.HasOne("SportsCenter.DAL.Models.Member", "Member")
                         .WithMany()
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SportsCenter.Core.Models.ClassSession", "Session")
+                    b.HasOne("SportsCenter.DAL.Models.ClassSession", "Session")
                         .WithMany()
                         .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -1123,17 +1120,17 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Session");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.ClassSession", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.ClassSession", b =>
                 {
                     b.Navigation("Attendances");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Coach", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Coach", b =>
                 {
                     b.Navigation("Classes");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Member", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Member", b =>
                 {
                     b.Navigation("Attendances");
 
@@ -1142,19 +1139,19 @@ namespace SportsCenter.Core.Data.Migrations
                     b.Navigation("Subscriptions");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.Sport", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.Sport", b =>
                 {
                     b.Navigation("Classes");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.TrainingClass", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.TrainingClass", b =>
                 {
                     b.Navigation("Enrollments");
 
                     b.Navigation("Sessions");
                 });
 
-            modelBuilder.Entity("SportsCenter.Core.Models.User", b =>
+            modelBuilder.Entity("SportsCenter.DAL.Models.User", b =>
                 {
                     b.Navigation("Coach");
 

@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using SportsCenter.Core.Data;
-using SportsCenter.Core.Models;
+using SportsCenter.DAL.Data;
+using SportsCenter.DAL.Models;
 
-namespace SportsCenter.Core.Services
+namespace SportsCenter.BLL.Services
 {
     /// <summary>Dữ liệu nhập hồ sơ thành viên.</summary>
     public record MemberInput(
@@ -20,7 +20,7 @@ namespace SportsCenter.Core.Services
     public class AccountService
     {
         private readonly SportsCenterContext _db;
-        public AccountService(SportsCenterContext db) { _db = db; }
+        internal AccountService(SportsCenterContext db) { _db = db; }
 
         public Task<List<User>> ListAsync()
         {
@@ -111,7 +111,7 @@ namespace SportsCenter.Core.Services
     public class MemberService
     {
         private readonly SportsCenterContext _db;
-        public MemberService(SportsCenterContext db) { _db = db; }
+        internal MemberService(SportsCenterContext db) { _db = db; }
 
         /// <summary>Danh sách thành viên kèm tài khoản và các gói (để tính trạng thái/thời hạn).</summary>
         public Task<List<Member>> ListAsync()
@@ -194,7 +194,7 @@ namespace SportsCenter.Core.Services
     public class CoachService
     {
         private readonly SportsCenterContext _db;
-        public CoachService(SportsCenterContext db) { _db = db; }
+        internal CoachService(SportsCenterContext db) { _db = db; }
 
         public Task<List<Coach>> ListAsync() =>
             _db.Coaches.AsNoTracking().Include(c => c.User).Include(c => c.Classes)

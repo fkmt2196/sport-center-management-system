@@ -5,7 +5,7 @@ using Project.Frontend.Views.Common;
 using Project.Frontend.Views.Manager;
 using Project.Frontend.Views.MemberArea;
 using Project.Frontend.Views.Shared;
-using SportsCenter.Core.Models;
+using SportsCenter.DAL.Models;
 
 namespace Project.Frontend.Shell
 {

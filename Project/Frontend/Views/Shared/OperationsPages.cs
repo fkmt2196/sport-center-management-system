@@ -1,3 +1,4 @@
+using SportsCenter.BLL;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,8 +9,8 @@ using Project.Frontend.Controls;
 using Project.Frontend.Data;
 using Project.Frontend.Forms;
 using Project.Frontend.Shell;
-using SportsCenter.Core.Models;
-using SportsCenter.Core.Services;
+using SportsCenter.DAL.Models;
+using SportsCenter.BLL.Services;
 
 namespace Project.Frontend.Views.Shared
 {
@@ -49,7 +50,7 @@ namespace Project.Frontend.Views.Shared
             Title = "Thành viên",
             Unit = "thành viên",
             EmptyIcon = Icons.People,
-            Load = async () => (await UiScope.Run(s => s.Members.ListAsync())).Select(m => MemberRow.From(m)).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Members.ListAsync())).Select(m => MemberRow.From(m)).ToList(),
             Search = r => $"{r.FullName} {r.Username} {r.Phone} {r.Email}",
             SearchPlaceholder = "Tìm theo tên, tên đăng nhập, số điện thoại, email...",
             DefaultSort = nameof(MemberRow.FullName),
@@ -83,7 +84,7 @@ namespace Project.Frontend.Views.Shared
         /// <summary>Hồ sơ đầy đủ của thành viên (gói, lớp, mục tiêu).</summary>
         public static async Task<bool> MemberDetailAsync(int memberId)
         {
-            var m = await UiScope.Run(s => s.Members.GetAsync(memberId));
+            var m = await ServiceScope.Run(s => s.Members.GetAsync(memberId));
             if (m == null) return false;
             var (state, end, plan) = Labels.Membership(m);
             var sections = new List<InfoSection>
@@ -115,7 +116,7 @@ namespace Project.Frontend.Views.Shared
                 Title = "Lớp đã đăng ký",
                 Unit = "lớp",
                 EmptyIcon = Icons.Library,
-                Load = async () => (await UiScope.Run(s => s.Classes.EnrollmentsOfMemberAsync(memberId))).Select(e => new EnrollmentRow { Entity = e }).ToList(),
+                Load = async () => (await ServiceScope.Run(s => s.Classes.EnrollmentsOfMemberAsync(memberId))).Select(e => new EnrollmentRow { Entity = e }).ToList(),
                 Search = r => r.ClassName + " " + r.CoachName,
                 DefaultSort = nameof(EnrollmentRow.EnrolledAt),
                 SortDirection = System.ComponentModel.ListSortDirection.Descending,
@@ -133,7 +134,7 @@ namespace Project.Frontend.Views.Shared
                     new RowAction<EnrollmentRow>(Icons.Close, "Hủy đăng ký lớp", async r =>
                     {
                         if (!await UiHost.ConfirmAsync("Hủy đăng ký lớp?", $"Hủy đăng ký lớp \"{r.ClassName}\" cho {name}? Học phí đã thu (nếu có) xử lý theo quy định hoàn phí.", "Hủy đăng ký")) return false;
-                        await UiScope.Run(s => s.Classes.CancelEnrollmentAsync(r.Id));
+                        await ServiceScope.Run(s => s.Classes.CancelEnrollmentAsync(r.Id));
                         UiHost.Toast($"Đã hủy đăng ký lớp \"{r.ClassName}\".");
                         return true;
                     }) { Danger = true, Visible = r => r.IsActive },
@@ -150,7 +151,7 @@ namespace Project.Frontend.Views.Shared
             Subtitle = "Lịch sử đăng ký / gia hạn gói thành viên",
             Unit = "lượt",
             EmptyIcon = Icons.Money,
-            Load = async () => (await UiScope.Run(s => s.Memberships.SubscriptionsAsync())).Select(x => new SubscriptionRow { Entity = x }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Memberships.SubscriptionsAsync())).Select(x => new SubscriptionRow { Entity = x }).ToList(),
             Search = r => $"{r.MemberName} {r.Username} {r.PlanName}",
             SearchPlaceholder = "Tìm theo thành viên, gói...",
             DefaultSort = nameof(SubscriptionRow.StartDate),
@@ -181,7 +182,7 @@ namespace Project.Frontend.Views.Shared
                 new RowAction<SubscriptionRow>(Icons.Close, "Hủy gói", async r =>
                 {
                     if (!await UiHost.ConfirmAsync("Hủy gói thành viên?", $"Hủy {r.PlanName} ({r.PeriodText}) của {r.MemberName}? Thành viên sẽ không check-in được bằng gói này.", "Hủy gói")) return false;
-                    await UiScope.Run(s => s.Memberships.CancelSubscriptionAsync(r.Id, "Hủy tại quầy"));
+                    await ServiceScope.Run(s => s.Memberships.CancelSubscriptionAsync(r.Id, "Hủy tại quầy"));
                     UiHost.Toast("Đã hủy gói.");
                     return true;
                 }) { Danger = true, Visible = r => r.State is "Active" or "Expiring" or "Upcoming" },
@@ -198,7 +199,7 @@ namespace Project.Frontend.Views.Shared
                 Title = title,
                 Unit = "hóa đơn",
                 EmptyIcon = Icons.Money,
-                Load = async () => (await UiScope.Run(s => s.Payments.ListAsync(today.AddMonths(-12)))).Select(p => new PaymentRow { Entity = p }).ToList(),
+                Load = async () => (await ServiceScope.Run(s => s.Payments.ListAsync(today.AddMonths(-12)))).Select(p => new PaymentRow { Entity = p }).ToList(),
                 Search = r => $"{r.InvoiceNo} {r.MemberName} {r.Username} {r.Note}",
                 SearchPlaceholder = "Tìm theo số hóa đơn, thành viên, nội dung...",
                 DefaultSort = nameof(PaymentRow.PaidAt),
@@ -241,7 +242,7 @@ namespace Project.Frontend.Views.Shared
             Title = "Yêu cầu hỗ trợ",
             Unit = "yêu cầu",
             EmptyIcon = Icons.Info,
-            Load = async () => (await UiScope.Run(s => s.Support.ListAsync())).Select(x => new SupportRow { Entity = x }).ToList(),
+            Load = async () => (await ServiceScope.Run(s => s.Support.ListAsync())).Select(x => new SupportRow { Entity = x }).ToList(),
             Search = r => $"{r.Subject} {r.Description} {r.MemberName}",
             SearchPlaceholder = "Tìm theo tiêu đề, nội dung, thành viên...",
             DefaultSort = nameof(SupportRow.CreatedAt),
@@ -268,7 +269,7 @@ namespace Project.Frontend.Views.Shared
 
         public static async Task ExportAsync(int paymentId)
         {
-            var p = await UiScope.Run(s => s.Payments.GetAsync(paymentId));
+            var p = await ServiceScope.Run(s => s.Payments.GetAsync(paymentId));
             var dlg = new SaveFileDialog { FileName = $"{p.InvoiceNo}.html", Filter = "Trang HTML (*.html)|*.html", Title = "Xuất hóa đơn" };
             if (dlg.ShowDialog() != true) return;
             await File.WriteAllTextAsync(dlg.FileName, PaymentService.InvoiceHtml(p, AppInfo.CenterName, Address), System.Text.Encoding.UTF8);
@@ -277,7 +278,7 @@ namespace Project.Frontend.Views.Shared
 
         public static async Task PrintAsync(int paymentId)
         {
-            var p = await UiScope.Run(s => s.Payments.GetAsync(paymentId));
+            var p = await ServiceScope.Run(s => s.Payments.GetAsync(paymentId));
             var dlg = new PrintDialog();
             if (dlg.ShowDialog() != true) return;
             dlg.PrintDocument(((IDocumentPaginatorSource)BuildDocument(p)).DocumentPaginator, $"Hóa đơn {p.InvoiceNo}");

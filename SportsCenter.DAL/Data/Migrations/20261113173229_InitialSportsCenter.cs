@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SportsCenter.Core.Data.Migrations
+namespace SportsCenter.DAL.Data.Migrations
 {
     /// <inheritdoc />
     public partial class InitialSportsCenter : Migration

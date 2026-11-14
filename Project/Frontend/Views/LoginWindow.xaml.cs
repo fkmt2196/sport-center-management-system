@@ -1,6 +1,7 @@
+using SportsCenter.BLL;
 using System.Windows;
 using Project.Frontend.Data;
-using SportsCenter.Core.Services;
+using SportsCenter.BLL.Services;
 
 namespace Project.Frontend.Views
 {
@@ -67,7 +68,7 @@ namespace Project.Frontend.Views
             RegisterButton.IsEnabled = false;
             try
             {
-                using var scope = new UiScope();
+                using var scope = new ServiceScope();
                 await scope.Auth.RegisterMemberAsync(username, RegPassword.Password, name, phone, email);
                 ShowLogin_Click(sender, e);
                 UsernameTextBox.Text = username;
@@ -109,7 +110,7 @@ namespace Project.Frontend.Views
             SetBusy(true);
             try
             {
-                using var scope = new UiScope();
+                using var scope = new ServiceScope();
                 var user = await scope.Auth.LoginAsync(username, password);
                 if (user != null)
                 {
