@@ -1,18 +1,25 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-// Các using này có thể cần sửa lại tùy theo không gian tên nhóm đang dùng
-using SportsCenter.BLL.Services; 
-using SportsCenter.BLL.ServiceScope; 
-using SportsCenter.DAL.Models;
+using SportsCenter.Core.Services;
+using SportsCenter.Core.Data;
+using SportsCenter.Core.Models;
 
 namespace SportsCenter.Frontend.UserControls
 {
     public partial class ManagerUserControl : UserControl
     {
+        // Khởi tạo Service trực tiếp (hoặc thông qua cơ chế cũ của nhóm)
+        private readonly UserService _userService;
+
         public ManagerUserControl()
         {
             InitializeComponent();
+            
+            // Giả định khởi tạo trực tiếp để code chạy được trên nhánh hiện tại
+            var context = new SportsCenterContext();
+            _userService = new UserService(context);
+            
             LoadData();
         }
 
@@ -20,13 +27,7 @@ namespace SportsCenter.Frontend.UserControls
         {
             try
             {
-                // Sử dụng ServiceScope.Run theo yêu cầu của trưởng nhóm
-                ServiceScope.Run(serviceProvider =>
-                {
-                    // userService.GetAllUsers() là hàm lấy dữ liệu em sẽ tạo bên BLL
-                    var userService = serviceProvider.GetRequiredService<UserService>();
-                    dgUsers.ItemsSource = userService.GetAllUsers();
-                });
+                dgUsers.ItemsSource = _userService.GetAllUsers();
             }
             catch (Exception ex)
             {
@@ -36,7 +37,6 @@ namespace SportsCenter.Frontend.UserControls
 
         private void btnAddUser_Click(object sender, RoutedEventArgs e)
         {
-            // Tạm thời lấy dữ liệu từ TextBox
             var newUser = new User 
             { 
                 Name = txtName.Text, 
@@ -45,13 +45,7 @@ namespace SportsCenter.Frontend.UserControls
 
             try
             {
-                ServiceScope.Run(serviceProvider =>
-                {
-                    // AddNewUser là hàm thêm dữ liệu em sẽ tạo bên BLL
-                    var userService = serviceProvider.GetRequiredService<UserService>();
-                    userService.AddNewUser(newUser);
-                });
-                
+                _userService.AddNewUser(newUser);
                 MessageBox.Show("Thêm thành công!");
                 LoadData(); 
             }
