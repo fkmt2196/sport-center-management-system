@@ -37,5 +37,22 @@ namespace SportsCenter.Core.Data
             _context.Users.Remove(user);
             _context.SaveChanges();
         }
+
+        public User? GetById(int id)
+        {
+            return _context.Users.FirstOrDefault(u => u.Id == id);
+        }
+
+        // Kiểm tra số điện thoại trùng lặp (trừ ID của user đang được sửa nếu có)
+        public bool CheckPhoneExists(string phone, int? currentUserId = null)
+        {
+            if (string.IsNullOrWhiteSpace(phone)) return false;
+            phone = phone.Trim();
+            if (currentUserId.HasValue)
+                return _context.Users.Any(u => u.Phone == phone && u.Id != currentUserId.Value);
+
+            return _context.Users.Any(u => u.Phone == phone);
+        }
+
     }
 }

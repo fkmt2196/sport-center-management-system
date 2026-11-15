@@ -23,9 +23,13 @@ namespace SportsCenter.Core.Services
         {
             if (string.IsNullOrWhiteSpace(user.FullName))
                 throw new Exception("Tên người dùng không được để trống!");
-
+            user.Phone = user.Phone?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(user.Email) || !user.Email.Contains("@"))
                 throw new Exception("Email không hợp lệ!");
+
+            // Bổ sung kiểm tra trùng số điện thoại
+            if (_userRepo.CheckPhoneExists(user.Phone))
+                throw new Exception("Số điện thoại này đã được sử dụng trong hệ thống!");
 
             _userRepo.AddUser(user);
         }
@@ -38,6 +42,10 @@ namespace SportsCenter.Core.Services
 
             if (string.IsNullOrWhiteSpace(user.Email) || !user.Email.Contains("@"))
                 throw new Exception("Email không hợp lệ!");
+
+            // Kiểm tra trùng số điện thoại, loại trừ ID của chính User đang sửa
+            if (_userRepo.CheckPhoneExists(user.Phone, user.Id))
+                throw new Exception("Số điện thoại này đã thuộc về tài khoản khác!");
 
             _userRepo.UpdateUser(user);
         }

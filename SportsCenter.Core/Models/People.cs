@@ -1,7 +1,10 @@
+using System;
+using System.ComponentModel; 
+using System.Runtime.CompilerServices; 
 namespace SportsCenter.Core.Models
 {
     /// <summary>Tài khoản đăng nhập (mọi vai trò).</summary>
-    public class User
+    public class User 
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
