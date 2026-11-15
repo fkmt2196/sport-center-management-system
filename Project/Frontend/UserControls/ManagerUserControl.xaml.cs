@@ -56,3 +56,63 @@ namespace SportsCenter.Frontend.UserControls
         }
     }
 }
+// Sự kiện khi bấm vào 1 dòng trong DataGrid
+        private void dgUsers_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dgUsers.SelectedItem is User selectedUser)
+            {
+                txtName.Text = selectedUser.Name;
+                txtEmail.Text = selectedUser.Email;
+            }
+        }
+
+        // Sự kiện nút Sửa
+        private void btnUpdateUser_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgUsers.SelectedItem is User selectedUser)
+            {
+                selectedUser.Name = txtName.Text;
+                selectedUser.Email = txtEmail.Text;
+
+                try
+                {
+                    _userService.UpdateExistingUser(selectedUser);
+                    MessageBox.Show("Cập nhật thành công!");
+                    LoadData();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi: " + ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Vui lòng chọn một người dùng trong bảng để sửa!");
+            }
+        }
+
+        // Sự kiện nút Xóa
+        private void btnDeleteUser_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgUsers.SelectedItem is User selectedUser)
+            {
+                var result = MessageBox.Show("Bạn có chắc chắn muốn xóa tài khoản này?", "Xác nhận", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        _userService.DeleteUser(selectedUser);
+                        MessageBox.Show("Xóa thành công!");
+                        LoadData();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Lỗi: " + ex.Message);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Vui lòng chọn một người dùng trong bảng để xóa!");
+            }
+        }
