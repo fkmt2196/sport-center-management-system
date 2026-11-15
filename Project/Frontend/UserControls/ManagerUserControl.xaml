@@ -1,0 +1,21 @@
+<UserControl x:Class="SportsCenter.Frontend.UserControls.ManagerUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+            <TextBox Margin="0,0,10,0" Text="Nhập tên..." Width="150" x:Name="txtName"/>
+            <TextBox Margin="0,0,10,0" Text="Nhập email..." Width="150" x:Name="txtEmail"/>
+            <Button Click="btnAddUser_Click" Content="Thêm" Margin="0,0,10,0" Width="80"/>
+            <Button Click="btnUpdateUser_Click" Content="Sửa" Margin="0,0,10,0" Width="80"/>
+            <Button Click="btnDeleteUser_Click" Content="Xóa" Width="80"/>
+        </StackPanel>
+        <DataGrid AutoGenerateColumns="True" Grid.Row="1" IsReadOnly="True" SelectionChanged="dgUsers_SelectionChanged" x:Name="dgUsers"/>
+
+        
+    </Grid>
+</UserControl>
