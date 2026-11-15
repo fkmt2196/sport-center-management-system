@@ -7,11 +7,14 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-            <TextBox x:Name="txtName" Width="150" Margin="0,0,10,0" Text="Nhập tên..."/>
-            <TextBox x:Name="txtEmail" Width="150" Margin="0,0,10,0" Text="Nhập email..."/>
-            <Button Content="Thêm Tài Khoản" Width="120" Click="btnAddUser_Click"/>
+        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+            <TextBox Margin="0,0,10,0" Text="Nhập tên..." Width="150" x:Name="txtName"/>
+            <TextBox Margin="0,0,10,0" Text="Nhập email..." Width="150" x:Name="txtEmail"/>
+            <Button Click="btnAddUser_Click" Content="Thêm" Margin="0,0,10,0" Width="80"/>
+            <Button Click="btnUpdateUser_Click" Content="Sửa" Margin="0,0,10,0" Width="80"/>
+            <Button Click="btnDeleteUser_Click" Content="Xóa" Width="80"/>
         </StackPanel>
+        <DataGrid AutoGenerateColumns="True" Grid.Row="1" IsReadOnly="True" SelectionChanged="dgUsers_SelectionChanged" x:Name="dgUsers"/>
 
         <DataGrid x:Name="dgUsers" Grid.Row="1" AutoGenerateColumns="True" IsReadOnly="True" />
     </Grid>
