@@ -16,6 +16,6 @@
         </StackPanel>
         <DataGrid AutoGenerateColumns="True" Grid.Row="1" IsReadOnly="True" SelectionChanged="dgUsers_SelectionChanged" x:Name="dgUsers"/>
 
-        <DataGrid x:Name="dgUsers" Grid.Row="1" AutoGenerateColumns="True" IsReadOnly="True" />
+        
     </Grid>
 </UserControl>

@@ -1,25 +1,28 @@
+using Microsoft.EntityFrameworkCore;
+using SportsCenter.Core.Data;
+using SportsCenter.Core.Models;
+using SportsCenter.Core.Services;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using SportsCenter.Core.Services;
-using SportsCenter.Core.Data;
-using SportsCenter.Core.Models;
 
 namespace SportsCenter.Frontend.UserControls
 {
     public partial class ManagerUserControl : UserControl
     {
-        // Khởi tạo Service trực tiếp (hoặc thông qua cơ chế cũ của nhóm)
         private readonly UserService _userService;
 
         public ManagerUserControl()
         {
             InitializeComponent();
-            
-            // Giả định khởi tạo trực tiếp để code chạy được trên nhánh hiện tại
-            var context = new SportsCenterContext();
+
+            // Khởi tạo Options cho DbContext (Sử dụng cấu hình tạm thời để chạy)
+            var optionsBuilder = new DbContextOptionsBuilder<SportsCenterContext>();
+           
+
+            var context = new SportsCenterContext(optionsBuilder.Options);
             _userService = new UserService(context);
-            
+
             LoadData();
         }
 
@@ -37,31 +40,31 @@ namespace SportsCenter.Frontend.UserControls
 
         private void btnAddUser_Click(object sender, RoutedEventArgs e)
         {
-            var newUser = new User 
-            { 
-                Name = txtName.Text, 
-                Email = txtEmail.Text 
+            var newUser = new User
+            {
+                FullName = txtName.Text, 
+                Email = txtEmail.Text
             };
 
             try
             {
                 _userService.AddNewUser(newUser);
                 MessageBox.Show("Thêm thành công!");
-                LoadData(); 
+                LoadData();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi: " + ex.Message);
             }
         }
-    }
-}
+    
+
 // Sự kiện khi bấm vào 1 dòng trong DataGrid
         private void dgUsers_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (dgUsers.SelectedItem is User selectedUser)
             {
-                txtName.Text = selectedUser.Name;
+                txtName.Text = selectedUser.FullName; 
                 txtEmail.Text = selectedUser.Email;
             }
         }
@@ -71,7 +74,7 @@ namespace SportsCenter.Frontend.UserControls
         {
             if (dgUsers.SelectedItem is User selectedUser)
             {
-                selectedUser.Name = txtName.Text;
+                selectedUser.FullName = txtName.Text; 
                 selectedUser.Email = txtEmail.Text;
 
                 try
@@ -116,3 +119,5 @@ namespace SportsCenter.Frontend.UserControls
                 MessageBox.Show("Vui lòng chọn một người dùng trong bảng để xóa!");
             }
         }
+    }
+}

@@ -21,21 +21,21 @@ namespace SportsCenter.Core.Services
 
         public void AddNewUser(User user)
         {
-            if (string.IsNullOrWhiteSpace(user.Name))
+            if (string.IsNullOrWhiteSpace(user.FullName))
                 throw new Exception("Tên người dùng không được để trống!");
-            
+
             if (string.IsNullOrWhiteSpace(user.Email) || !user.Email.Contains("@"))
                 throw new Exception("Email không hợp lệ!");
 
             _userRepo.AddUser(user);
         }
-    }
-}
-public void UpdateExistingUser(User user)
+
+
+        public void UpdateExistingUser(User user)
         {
-            if (string.IsNullOrWhiteSpace(user.Name))
+            if (string.IsNullOrWhiteSpace(user.FullName))
                 throw new Exception("Tên người dùng không được để trống!");
-            
+
             if (string.IsNullOrWhiteSpace(user.Email) || !user.Email.Contains("@"))
                 throw new Exception("Email không hợp lệ!");
 
@@ -46,3 +46,5 @@ public void UpdateExistingUser(User user)
         {
             _userRepo.DeleteUser(user);
         }
+    }
+}
