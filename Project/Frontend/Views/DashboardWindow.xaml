@@ -35,6 +35,7 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <!-- Chuông thông báo -->
@@ -64,7 +65,12 @@
                     </StackPanel>
 
                     <!-- Người dùng -->
-                    <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="RefreshPageButton" Grid.Column="4" Style="{StaticResource Btn.Icon}" Content="&#xE72C;" FontSize="16" Margin="0,0,8,0"
+                            ToolTip="Làm mới trang hiện tại" Click="RefreshPageButton_Click"/>
+
+                    <Button x:Name="ProfileButton" Grid.Column="5" Style="{StaticResource Btn.Ghost}" Padding="6,4" Click="ProfileButton_Click"
+                            ToolTip="Mở tài khoản của tôi">
+                      <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Border Width="36" Height="36" CornerRadius="18" Background="{StaticResource PrimarySoft2Brush}">
                             <TextBlock x:Name="AvatarText" HorizontalAlignment="Center" VerticalAlignment="Center"
                                        FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource PrimaryPressedBrush}"/>
@@ -73,9 +79,10 @@
                             <TextBlock x:Name="UserInfoTextBlock" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}"/>
                             <TextBlock x:Name="UserRoleText" Style="{StaticResource Text.Caption}"/>
                         </StackPanel>
-                    </StackPanel>
+                      </StackPanel>
+                    </Button>
 
-                    <Button Grid.Column="5" Style="{StaticResource Btn.IconDanger}" Content="&#xE7E8;" Margin="12,0,0,0"
+                    <Button Grid.Column="6" Style="{StaticResource Btn.IconDanger}" Content="&#xE7E8;" Margin="12,0,0,0"
                             ToolTip="Đăng xuất" Click="LogoutButton_Click"/>
                 </Grid>
             </Border>
@@ -121,8 +128,6 @@
                 <!-- Menu -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="12,16,12,12">
-                        <TextBlock x:Name="NavSectionLabel" Text="MENU" Foreground="{StaticResource SidebarMutedBrush}" FontSize="11"
-                                   FontWeight="SemiBold" Margin="14,0,0,8"/>
                         <StackPanel x:Name="NavPanel"/>
                     </StackPanel>
                 </ScrollViewer>

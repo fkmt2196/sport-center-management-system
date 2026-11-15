@@ -45,11 +45,11 @@ namespace SportsCenter.BLL.Services
 
         /// <summary>
         /// Đăng ký hoặc gia hạn gói. Gia hạn nối tiếp ngay sau ngày hết hạn của gói hiện tại.
-        /// Tạo phiếu thu tương ứng. Thành viên tự đăng ký (thanh toán online) hoặc Lễ tân/Quản lý tại quầy.
+        /// Tạo phiếu thu tương ứng. Thành viên tự đăng ký (thanh toán online) hoặc Lễ tân ghi nhận tại quầy.
         /// </summary>
         public async Task<(Subscription Subscription, Payment Payment)> SubscribeAsync(int memberId, int planId, PaymentMethod method, string note = "")
         {
-            Authorization.Require(UserRole.Member, UserRole.Receptionist, UserRole.Manager);
+            Authorization.Require(UserRole.Member, UserRole.Receptionist);
             var member = await _db.Members.Include(m => m.Subscriptions).FirstAsync(m => m.Id == memberId);
             if (Authorization.Is(UserRole.Member) && member.UserId != AppSession.UserId)
                 throw new UnauthorizedAccessException("Bạn chỉ được đăng ký gói cho chính mình.");
@@ -81,7 +81,7 @@ namespace SportsCenter.BLL.Services
 
         public async Task CancelSubscriptionAsync(int subscriptionId, string reason)
         {
-            Authorization.Require(UserRole.Manager, UserRole.Receptionist);
+            Authorization.Require(UserRole.Receptionist);
             var s = await _db.Subscriptions.FirstAsync(x => x.Id == subscriptionId);
             s.Status = SubscriptionStatus.Cancelled;
             s.Note = string.IsNullOrWhiteSpace(reason) ? s.Note : $"Hủy: {reason.Trim()}";
@@ -110,7 +110,8 @@ namespace SportsCenter.BLL.Services
 
         public async Task<List<Payment>> ListAsync(DateTime? from = null, DateTime? to = null, int? memberId = null)
         {
-            if (memberId == null) Authorization.Require(UserRole.Manager, UserRole.Receptionist);
+            Authorization.Require(UserRole.Member, UserRole.Receptionist);
+            if (memberId == null) Authorization.Require(UserRole.Receptionist);
             else await EnsureOwnAsync(memberId.Value);
             return await _db.Payments.AsNoTracking().Include(p => p.Member).ThenInclude(m => m!.User).Include(p => p.ReceivedBy)
                 .Where(p => (from == null || p.PaidAt >= from) && (to == null || p.PaidAt < to) && (memberId == null || p.MemberId == memberId))
@@ -120,7 +121,7 @@ namespace SportsCenter.BLL.Services
         /// <summary>Ghi nhận khoản thu khác tại quầy (phí dịch vụ, PT, đồ uống...).</summary>
         public async Task<Payment> RecordAsync(int memberId, decimal amount, PaymentMethod method, string note)
         {
-            Authorization.Require(UserRole.Receptionist, UserRole.Manager);
+            Authorization.Require(UserRole.Receptionist);
             if (amount <= 0) throw new ValidationException("Số tiền phải lớn hơn 0.", "Amount");
             var p = new Payment
             {
@@ -134,12 +135,13 @@ namespace SportsCenter.BLL.Services
 
         public async Task<Payment> GetAsync(int id)
         {
+            Authorization.Require(UserRole.Member, UserRole.Receptionist);
             var p = await _db.Payments.AsNoTracking().Include(x => x.Member).ThenInclude(m => m!.User).Include(x => x.ReceivedBy).FirstAsync(x => x.Id == id);
             await EnsureOwnAsync(p.MemberId);
             return p;
         }
 
-        /// <summary>Thành viên chỉ xem được hóa đơn của chính mình; nhân viên xem được tất cả.</summary>
+        /// <summary>Thành viên chỉ xem được hóa đơn của chính mình; Lễ tân xem được tất cả.</summary>
         private async Task EnsureOwnAsync(int memberId)
         {
             if (!Authorization.Is(UserRole.Member)) return;
@@ -375,47 +377,4 @@ namespace SportsCenter.BLL.Services
         }
     }
 
-    // =====================================================================
-    // YÊU CẦU HỖ TRỢ & AUDIT LOG
-    // =====================================================================
-    public class SupportService
-    {
-        private readonly SportsCenterContext _db;
-        internal SupportService(SportsCenterContext db) { _db = db; }
-
-        public Task<List<SupportRequest>> ListAsync()
-        {
-            Authorization.Require(UserRole.Receptionist, UserRole.Manager);
-            return _db.SupportRequests.AsNoTracking().Include(s => s.Member).ThenInclude(m => m!.User).Include(s => s.CreatedBy)
-                .OrderBy(s => s.Status).ThenByDescending(s => s.CreatedAt).ToListAsync();
-        }
-
-        public async Task SaveAsync(SupportRequest input)
-        {
-            Authorization.Require(UserRole.Receptionist, UserRole.Manager);
-            var s = input.Id == 0 ? _db.SupportRequests.Add(new SupportRequest { CreatedByUserId = AppSession.UserId ?? input.CreatedByUserId }).Entity
-                                  : await _db.SupportRequests.FirstAsync(x => x.Id == input.Id);
-            s.MemberId = input.MemberId;
-            s.Subject = input.Subject.Trim();
-            s.Description = input.Description.Trim();
-            s.Response = input.Response.Trim();
-            if (s.Status != SupportStatus.Resolved && input.Status == SupportStatus.Resolved) s.ResolvedAt = DateTime.Now;
-            if (input.Status != SupportStatus.Resolved) s.ResolvedAt = null;
-            s.Status = input.Status;
-            await _db.SaveChangesAsync();
-        }
-    }
-
-    public class AuditService
-    {
-        private readonly SportsCenterContext _db;
-        internal AuditService(SportsCenterContext db) { _db = db; }
-
-        public Task<List<AuditLog>> ListAsync(DateTime from, DateTime to)
-        {
-            Authorization.Require(UserRole.Manager);
-            return _db.AuditLogs.AsNoTracking().Where(a => a.Timestamp >= from && a.Timestamp < to)
-                .OrderByDescending(a => a.Timestamp).Take(5000).ToListAsync();
-        }
-    }
 }

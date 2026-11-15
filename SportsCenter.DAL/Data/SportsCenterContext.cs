@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SportsCenter.DAL.Models;
 
 namespace SportsCenter.DAL.Data
@@ -26,10 +25,6 @@ namespace SportsCenter.DAL.Data
         public DbSet<ProgressReview> ProgressReviews => Set<ProgressReview>();
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<SupportRequest> SupportRequests => Set<SupportRequest>();
-        public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
-
-        /// <summary>Tắt khi seed dữ liệu để không sinh hàng nghìn dòng audit.</summary>
-        public bool AuditEnabled { get; set; } = true;
 
         protected override void ConfigureConventions(ModelConfigurationBuilder b)
         {
@@ -183,16 +178,6 @@ namespace SportsCenter.DAL.Data
                 e.Property(x => x.Description).HasMaxLength(2000);
                 e.Property(x => x.Response).HasMaxLength(1000);
             });
-            m.Entity<AuditLog>(e =>
-            {
-                e.Property(x => x.Username).HasMaxLength(50);
-                e.Property(x => x.Action).HasMaxLength(50);
-                e.Property(x => x.EntityName).HasMaxLength(50);
-                e.Property(x => x.EntityId).HasMaxLength(50);
-                e.Property(x => x.Details).HasMaxLength(2000);
-                e.HasIndex(x => x.Timestamp);
-            });
-
             // Mặc định KHÔNG xóa dây chuyền (tránh mất dữ liệu lịch sử và lỗi "multiple cascade paths"
             // của SQL Server). Chỉ các quan hệ "thuộc về" thật sự mới xóa theo.
             var cascade = new HashSet<(Type Dependent, Type Principal)>
@@ -213,103 +198,5 @@ namespace SportsCenter.DAL.Data
             }
         }
 
-        #region Audit log tự động
-
-        private static readonly HashSet<string> IgnoredProps = new() { nameof(User.LastLogin) };
-
-        public override int SaveChanges(bool acceptAllChangesOnSuccess)
-        {
-            var pending = CollectAudit();
-            var result = base.SaveChanges(acceptAllChangesOnSuccess);
-            if (pending.Count > 0) { AuditLogs.AddRange(pending.Select(p => p.ToLog())); base.SaveChanges(acceptAllChangesOnSuccess); }
-            return result;
-        }
-
-        public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
-        {
-            var pending = CollectAudit();
-            var result = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-            if (pending.Count > 0) { AuditLogs.AddRange(pending.Select(p => p.ToLog())); await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken); }
-            return result;
-        }
-
-        private sealed class PendingAudit
-        {
-            public required EntityEntry Entry;
-            public required string Action;
-            public required string Details;
-            public string? KeyBefore;
-
-            public AuditLog ToLog() => new()
-            {
-                UserId = AppSession.UserId,
-                Username = AppSession.Username,
-                Action = Action,
-                EntityName = Entry.Metadata.ClrType.Name,
-                EntityId = KeyBefore ?? KeyOf(Entry),
-                Details = Details.Length > 2000 ? Details[..1997] + "..." : Details,
-                Timestamp = DateTime.Now
-            };
-        }
-
-        private List<PendingAudit> CollectAudit()
-        {
-            var list = new List<PendingAudit>();
-            if (!AuditEnabled) return list;
-            ChangeTracker.DetectChanges();
-            foreach (var e in ChangeTracker.Entries())
-            {
-                if (e.Entity is AuditLog) continue;
-                switch (e.State)
-                {
-                    case EntityState.Added:
-                        list.Add(new PendingAudit { Entry = e, Action = "Thêm", Details = Summary(e, current: true) });
-                        break;
-                    case EntityState.Deleted:
-                        list.Add(new PendingAudit { Entry = e, Action = "Xóa", Details = Summary(e, current: false), KeyBefore = KeyOf(e) });
-                        break;
-                    case EntityState.Modified:
-                        if (e.Entity is Notification) continue; // đánh dấu đã đọc: không cần lưu vết
-                        var changes = e.Properties
-                            .Where(p => p.IsModified && !IgnoredProps.Contains(p.Metadata.Name) && !Equals(p.OriginalValue, p.CurrentValue))
-                            .Select(p => p.Metadata.Name == nameof(User.PasswordHash)
-                                ? "Mật khẩu: (đã thay đổi)"
-                                : $"{p.Metadata.Name}: {Fmt(p.OriginalValue)} → {Fmt(p.CurrentValue)}")
-                            .ToList();
-                        if (changes.Count == 0) continue;
-                        list.Add(new PendingAudit { Entry = e, Action = "Cập nhật", Details = Summary(e, current: true) + " | " + string.Join("; ", changes) });
-                        break;
-                }
-            }
-            return list;
-        }
-
-        private static string KeyOf(EntityEntry e) =>
-            string.Join(",", e.Metadata.FindPrimaryKey()!.Properties.Select(p => e.Property(p.Name).CurrentValue?.ToString() ?? ""));
-
-        /// <summary>Mô tả ngắn bản ghi: dùng các trường "tên" phổ biến nếu có.</summary>
-        private static string Summary(EntityEntry e, bool current)
-        {
-            foreach (var name in new[] { "Username", "FullName", "Name", "Title", "Subject", "InvoiceNo" })
-            {
-                var prop = e.Metadata.FindProperty(name);
-                if (prop == null) continue;
-                var v = current ? e.Property(name).CurrentValue : e.Property(name).OriginalValue;
-                if (v is string s && s.Length > 0) return s;
-            }
-            var ids = e.Metadata.GetProperties().Where(p => p.IsForeignKey())
-                .Select(p => $"{p.Name}={(current ? e.Property(p.Name).CurrentValue : e.Property(p.Name).OriginalValue)}");
-            return string.Join(", ", ids);
-        }
-
-        private static string Fmt(object? v) => v switch
-        {
-            null => "(trống)",
-            DateTime d => d.ToString("dd/MM/yyyy HH:mm"),
-            string s when s.Length > 60 => s[..57] + "...",
-            _ => v.ToString() ?? ""
-        };
-
-        #endregion
     }
 }

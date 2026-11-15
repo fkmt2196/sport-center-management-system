@@ -361,12 +361,29 @@ namespace Project.Frontend.Forms
         public static async Task<bool> SessionAsync(SessionRow? existing)
         {
             var rooms = (await ServiceScope.Run(s => s.Facilities.RoomsAsync())).Where(r => r.IsActive || r.Id == existing?.Entity.RoomId).Select(r => (r.Name, (object)r.Id)).ToList();
-            var classes = existing == null
-                ? (await ServiceScope.Run(s => s.Classes.ListAsync())).Where(c => c.Class.Status == ClassStatus.Open).Select(c => (c.Class.Name, (object)c.Class.Id)).ToList()
-                : new List<(string, object)>();
+            var classList = existing == null ? await ServiceScope.Run(s => s.Classes.ListAsync()) : new List<ClassInfo>();
+            var sports = existing == null ? (await ServiceScope.Run(s => s.Facilities.SportsAsync())).Where(s => s.IsActive).ToList() : new List<Sport>();
+            var coaches = existing == null ? (await ServiceScope.Run(s => s.Coaches.ListAsync())).Where(c => c.IsAvailable && c.User!.IsActive).ToList() : new List<Coach>();
             var e = existing?.Entity;
             var fields = new List<FormField>();
-            if (existing == null) fields.Add(new("Class", "Lớp", FieldKind.Combo) { Required = true, Wide = true, Options = classes });
+            if (existing == null)
+            {
+                var sportOptions = sports.Select(s => (s.Name, (object)s.Id)).ToList();
+                fields.Add(new FormField("Sport", "Bộ môn", FieldKind.Combo) { Required = true, Wide = true, Options = sportOptions,
+                    OnChanged = (f, value) =>
+                    {
+                        var sportId = Rules.Id(value);
+                        var sport = sports.FirstOrDefault(x => x.Id == sportId);
+                        f.SetOptions("Class", classList.Where(x => x.Class.SportId == sportId && x.Class.Status == ClassStatus.Open)
+                            .Select(x => (x.Class.Name, (object)x.Class.Id)));
+                        f.SetOptions("Coach", sport == null ? Enumerable.Empty<(string, object)>() : coaches
+                            .Where(c => c.Specialty.Contains(sport.Name, StringComparison.CurrentCultureIgnoreCase))
+                            .Select(c => ($"{c.User!.FullName} · {c.Specialty}", (object)c.Id)));
+                    }});
+                fields.Add(new FormField("Class", "Lớp", FieldKind.Combo) { Required = true, Wide = true, Options = Array.Empty<(string, object)>() });
+                fields.Add(new FormField("Coach", "Huấn luyện viên", FieldKind.Combo) { Required = true, Wide = true, Options = Array.Empty<(string, object)>(),
+                    Hint = "Chỉ hiển thị HLV có chuyên môn thuộc bộ môn đã chọn." });
+            }
             fields.AddRange(new[]
             {
                 new FormField("Room", "Phòng tập", FieldKind.Combo) { Required = true, Options = rooms, Value = e?.RoomId },
@@ -384,7 +401,7 @@ namespace Project.Frontend.Forms
                     Id = e?.Id ?? 0, ClassId = e?.ClassId ?? Rules.Id(f.Get("Class")), RoomId = Rules.Id(f.Get("Room")),
                     StartTime = date + f.Value<TimeSpan>("Start")!.Value, EndTime = date + f.Value<TimeSpan>("End")!.Value,
                     Note = f.Text("Note"), Status = e?.Status ?? SessionStatus.Scheduled
-                }));
+                }, existing == null ? Rules.Id(f.Get("Coach")) : null));
                 return true;
             }, existing == null ? "Thêm ca" : "Lưu & thông báo");
             if (!await UiHost.ShowDialogAsync(dialog)) return false;
@@ -424,7 +441,7 @@ namespace Project.Frontend.Forms
                 hint = end.HasValue && end >= DateTime.Today ? $"Gói hiện tại còn hạn đến {end:dd/MM/yyyy}: gói mới sẽ nối tiếp từ {end.Value.AddDays(1):dd/MM/yyyy}." : "Gói mới bắt đầu từ hôm nay.";
             }
             var fields = new List<FormField>();
-            if (members != null) fields.Add(new("Member", "Thành viên", FieldKind.Combo) { Required = true, Wide = true, Options = members });
+            if (members != null) fields.Add(new("Member", "Tìm thành viên", FieldKind.Combo) { Required = true, Wide = true, Searchable = true, Placeholder = "Nhập họ tên, tên đăng nhập hoặc số điện thoại...", Options = members });
             fields.Add(new("Plan", "Gói thành viên", FieldKind.Combo) { Required = true, Wide = true, Options = plans, Value = planId, Hint = hint });
             if (!selfService)
             {
@@ -491,32 +508,6 @@ namespace Project.Frontend.Forms
             return payment;
         }
 
-        public static async Task<bool> SupportAsync(SupportRequest? existing)
-        {
-            var members = await Rules.MemberOptions();
-            members.Insert(0, ("(Khách vãng lai / không xác định)", 0));
-            var dialog = new FormDialog(existing == null ? "Ghi nhận yêu cầu hỗ trợ" : "Xử lý yêu cầu hỗ trợ", existing?.Subject ?? "Yêu cầu từ thành viên tại quầy.", Icons.Info, new[]
-            {
-                new FormField("Member", "Thành viên", FieldKind.Combo) { Wide = true, Options = members, Value = existing?.MemberId ?? 0 },
-                new FormField("Subject", "Tiêu đề", FieldKind.Text) { Required = true, Wide = true, MaxLength = 200, Value = existing?.Subject },
-                new FormField("Desc", "Nội dung", FieldKind.Multiline) { Required = true, Wide = true, MaxLength = 2000, Value = existing?.Description },
-                new FormField("Status", "Trạng thái", FieldKind.Combo) { Required = true, Value = existing?.Status ?? SupportStatus.Open, Options = Rules.Enum<SupportStatus>("support") },
-                new FormField("Response", "Phản hồi / cách xử lý", FieldKind.Multiline) { Wide = true, MaxLength = 1000, Value = existing?.Response },
-            }, async f =>
-            {
-                var memberIdValue = Rules.Id(f.Get("Member"));
-                await ServiceScope.Run(s => s.Support.SaveAsync(new SupportRequest
-                {
-                    Id = existing?.Id ?? 0, MemberId = memberIdValue == 0 ? null : memberIdValue, Subject = f.Text("Subject"),
-                    Description = f.Text("Desc"), Status = (SupportStatus)f.Get("Status")!, Response = f.Text("Response"),
-                    CreatedByUserId = existing?.CreatedByUserId ?? Me.User.Id
-                }));
-                return true;
-            });
-            if (!await UiHost.ShowDialogAsync(dialog)) return false;
-            UiHost.Toast("Đã lưu yêu cầu hỗ trợ.");
-            return true;
-        }
     }
 
     // =====================================================================
@@ -548,7 +539,7 @@ namespace Project.Frontend.Forms
                 new FormField("End", "Đến ngày", FieldKind.Date) { Value = existing?.EndDate ?? DateTime.Today.AddDays(28),
                     Validate = (f, v) => v is DateTime e && f.Value<DateTime>("Start") is DateTime s && e < s ? "Ngày kết thúc phải sau ngày bắt đầu." : null },
                 new FormField("Content", "Nội dung (bài tập, hiệp × lần, nghỉ...)", FieldKind.Multiline) { Required = true, Wide = true, MaxLength = 4000, Value = existing?.Content ?? content,
-                    Hint = "Mẹo: dùng Trợ lý AI để có gợi ý theo mục tiêu và trình độ học viên." },
+                    Hint = "Ghi rõ bài tập, số hiệp, số lần và thời gian nghỉ." },
             }, async f =>
             {
                 var m = Rules.Id(f.Get("Member")); var c = Rules.Id(f.Get("Class"));

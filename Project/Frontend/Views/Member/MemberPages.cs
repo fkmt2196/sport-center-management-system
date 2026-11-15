@@ -183,6 +183,10 @@ namespace Project.Frontend.Views.MemberArea
                 var (member, plans) = await ServiceScope.Run(async s => (await s.Members.GetAsync(MemberId), await s.Memberships.PlansAsync(activeOnly: true)));
                 if (member == null) return;
                 var (state, end, plan) = Labels.Membership(member);
+                var upcoming = member.Subscriptions
+                    .Where(s => s.Status == SubscriptionStatus.Active && s.StartDate.Date > DateTime.Today)
+                    .OrderBy(s => s.StartDate)
+                    .FirstOrDefault();
                 _top.Children.Clear();
                 var card = new Border { Style = R<Style>("Card"), Margin = new Thickness(0, 0, 0, 16) };
                 var dock = new DockPanel();
@@ -204,6 +208,12 @@ namespace Project.Frontend.Views.MemberArea
                          : days >= 0 ? $"Hạn sử dụng đến {end:dd/MM/yyyy} – còn {days} ngày."
                          : $"Gói đã hết hạn từ {end:dd/MM/yyyy}. Gia hạn để tiếp tục tập và đăng ký lớp."
                 });
+                if (upcoming != null)
+                    info.Children.Add(new TextBlock
+                    {
+                        Style = R<Style>("Text.Secondary"), Margin = new Thickness(0, 6, 0, 0),
+                        Text = $"Gói tiếp theo: {upcoming.Plan?.Name} · bắt đầu từ {upcoming.StartDate:dd/MM/yyyy}."
+                    });
                 dock.Children.Add(info);
                 card.Child = dock;
                 _top.Children.Add(card);

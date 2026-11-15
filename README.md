@@ -12,12 +12,11 @@ Project.slnx
 │   ├── ServiceScope.cs           #    Điểm vào duy nhất cho giao diện: ServiceScope.Run(s => s.Members.ListAsync())
 │   │                             #    + DatabaseInitializer (migrate/seed khi khởi động)
 │   ├── Services/                 #    Nghiệp vụ + kiểm tra quyền theo vai trò (Authorization), PasswordHasher
-│   └── AI/                       #    IAiCoachAssistant: ClaudeAiAssistant / TemplateAiAssistant (gợi ý mẫu)
 ├── SportsCenter.DAL/             # 3. DATA ACCESS – không tham chiếu tầng nào phía trên
 │   ├── Models/                   #    Entity: User, Member, Coach, Sport, Room, TrainingClass, ClassSession,
 │   │                             #      Enrollment, Attendance, CheckIn, MembershipPlan, Subscription, Payment,
-│   │                             #      TrainingPlan, WorkoutLog, ProgressReview, Notification, SupportRequest, AuditLog
-│   └── Data/                     #    SportsCenterContext (audit log tự động), DbConfig, DbSeeder, Migrations, AppSession
+│   │                             #      TrainingPlan, WorkoutLog, ProgressReview, Notification
+│   └── Data/                     #    SportsCenterContext, DbConfig, DbSeeder, Migrations, AppSession
 └── Project.ArchitectureTests/    # Test kiến trúc (NetArchTest) giữ đúng ranh giới 3 tầng
 ```
 
@@ -37,7 +36,7 @@ Luồng gọi: **Giao diện → `ServiceScope` (BLL) → Service → `SportsCen
 - Giao diện không dùng `SportsCenter.DAL.Data`, `Microsoft.EntityFrameworkCore`, `Microsoft.Data.SqlClient`, `System.Data`.
 - BLL không dùng WPF (`System.Windows`, `Microsoft.Win32`) hay `Project.*`.
 - DAL không dùng BLL hay WPF; `Models` là entity thuần (không phụ thuộc DbContext/EF).
-- `AI` không phụ thuộc `Services`; DbContext/DbConfig/DbSeeder vẫn là `internal`; không service nào có constructor public nhận DbContext.
+- DbContext/DbConfig/DbSeeder vẫn là `internal`; không service nào có constructor public nhận DbContext.
 
 Giao diện được dùng entity trong `SportsCenter.DAL.Models` để hiển thị/nhập liệu (tham chiếu bắc cầu qua BLL).
 Thêm chức năng mới: viết truy vấn trong service ở BLL, thêm thuộc tính vào `ServiceScope` nếu là service mới, rồi gọi
@@ -71,19 +70,6 @@ dotnet run --project Project
 
 Thành viên mới cũng có thể tự **đăng ký tài khoản** ngay ở màn hình đăng nhập.
 
-## Trợ lý AI
-
-Tính năng AI nằm sau interface `IAiCoachAssistant` (`SportsCenter.BLL/AI`):
-
-- Có biến môi trường `ANTHROPIC_API_KEY` → gọi Claude (`claude-opus-5-5`) qua SDK chính thức của Anthropic,
-  bật server-side fallback khi mô hình chính từ chối trả lời.
-- Không có API key (hoặc gọi API lỗi) → `TemplateAiAssistant` trả gợi ý mẫu theo mục tiêu, trình độ, chấn thương,
-  lịch sử tập — ứng dụng vẫn chạy bình thường.
-
-```powershell
-$env:ANTHROPIC_API_KEY = "sk-ant-..."   # rồi chạy lại ứng dụng
-```
-
 ## Migration
 
 ```powershell
@@ -100,12 +86,10 @@ dotnet ef database drop --force --project SportsCenter.DAL
 - **Quản lý:** tổng quan, báo cáo (doanh thu theo tháng, thành viên mới, đăng ký lớp, lấp đầy lớp, xuất CSV);
   thành viên, huấn luyện viên, tài khoản & phân quyền (đổi vai trò, khóa/mở, đặt lại mật khẩu); lớp học (phân công HLV,
   xếp lịch theo tuần), lịch hoạt động (thêm/đổi/hủy ca – tự thông báo cho thành viên), bộ môn, phòng tập; gói thành viên,
-  đăng ký gói, thanh toán; nhật ký thao tác; yêu cầu hỗ trợ.
+  đăng ký gói, thanh toán.
 - **Huấn luyện viên:** lịch dạy, lớp của tôi, học viên (hồ sơ, mục tiêu, tiến độ), điểm danh từng buổi, kế hoạch tập
-  cá nhân/cả lớp, kết quả tập, đánh giá tiến độ, gửi thông báo/bài tập về nhà, trợ lý AI gợi ý bài tập.
+  cá nhân/cả lớp, kết quả tập, đánh giá tiến độ, gửi thông báo/bài tập về nhà.
 - **Thành viên:** lịch tập & thông tin HLV, đăng ký/hủy lớp, đăng ký/gia hạn gói (online), lịch sử điểm danh,
-  kết quả & nhận xét, kế hoạch tập, hỏi AI, thông báo (nhắc lịch, đổi lịch, hết hạn gói), cập nhật hồ sơ.
+  kết quả & nhận xét, kế hoạch tập, thông báo (nhắc lịch, đổi lịch, hết hạn gói), cập nhật hồ sơ.
 - **Lễ tân:** check-in (kiểm tra hạn gói, tự điểm danh buổi lớp sắp diễn ra), đăng ký thành viên tại quầy,
-  đăng ký/gia hạn gói, đăng ký/hủy lớp hộ, ghi nhận thanh toán, in/xuất hóa đơn, yêu cầu hỗ trợ.
-
-Mọi thay đổi dữ liệu và đăng nhập/đăng xuất được ghi tự động vào **Nhật ký thao tác**.
+  đăng ký/gia hạn gói, đăng ký/hủy lớp hộ, ghi nhận thanh toán, in/xuất hóa đơn.

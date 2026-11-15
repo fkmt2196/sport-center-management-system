@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!-- TẦNG 2 – BUSINESS LOGIC LAYER (BLL)
-       Services (nghiệp vụ + kiểm tra quyền), AI, ServiceScope (điểm vào cho giao diện).
+       Services (nghiệp vụ + kiểm tra quyền), ServiceScope (điểm vào cho giao diện).
        Chỉ tham chiếu DAL; không tham chiếu WPF/giao diện. -->
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -12,10 +12,6 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Project.ArchitectureTests" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Anthropic" Version="13.8.0" />
   </ItemGroup>
 
   <ItemGroup>

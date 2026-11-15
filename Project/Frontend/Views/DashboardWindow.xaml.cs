@@ -10,6 +10,7 @@ using SportsCenter.DAL.Models;
 using Project.Frontend.Controls;
 using Project.Frontend.Data;
 using Project.Frontend.Shell;
+using Project.Frontend.Views.Common;
 
 namespace Project.Frontend.Views
 {
@@ -32,6 +33,7 @@ namespace Project.Frontend.Views
         private bool _userCollapsed;     // người dùng tự thu gọn sidebar khi màn hình rộng
         private bool _drawerOpen;        // menu trượt đang mở (màn hình hẹp)
         private TaskCompletionSource<bool>? _dialogTcs;
+        private Func<FrameworkElement>? _currentPageFactory;
 
         public DashboardWindow(User user)
         {
@@ -69,20 +71,8 @@ namespace Project.Frontend.Views
                 return;
             }
 
-            var section = "";
             foreach (var item in items)
             {
-                if (item.Section != section && item.Section.Length > 0)
-                {
-                    section = item.Section;
-                    var label = new TextBlock
-                    {
-                        Text = section.ToUpperInvariant(), FontSize = 11, FontWeight = FontWeights.SemiBold,
-                        Foreground = (Brush)FindResource("SidebarMutedBrush"), Margin = new Thickness(14, NavPanel.Children.Count == 0 ? 0 : 14, 0, 6)
-                    };
-                    _sectionLabels.Add(label);
-                    NavPanel.Children.Add(label);
-                }
                 var button = new RadioButton
                 {
                     Style = (Style)FindResource("Nav.Item"),
@@ -96,12 +86,8 @@ namespace Project.Frontend.Views
                 _nav.Add((button, item));
             }
             _nav[0].Button.IsChecked = true;
-            NavSectionLabel.Visibility = Visibility.Collapsed;
-            BellButton.Visibility = _nav.Any(n => n.Item.Title == Navigation.NotificationsTitle) ? Visibility.Visible : Visibility.Collapsed;
             Loaded += async (_, _) => await InitNotificationsAsync();
         }
-
-        private readonly List<TextBlock> _sectionLabels = new();
 
         /// <summary>Thành viên: sinh nhắc lịch/hết hạn gói; mọi vai trò: cập nhật số thông báo chưa đọc.</summary>
         private async Task InitNotificationsAsync()
@@ -123,11 +109,31 @@ namespace Project.Frontend.Views
             BellButton.ToolTip = unread > 0 ? $"{unread} thông báo chưa đọc" : "Thông báo";
         }
 
-        private void BellButton_Click(object sender, RoutedEventArgs e) => NavigateTo(Navigation.NotificationsTitle);
+        private void BellButton_Click(object sender, RoutedEventArgs e) => ShowUtilityPage(Navigation.NotificationsTitle, NotificationsPage.Create);
+
+        private void ProfileButton_Click(object sender, RoutedEventArgs e) => ShowUtilityPage("Tài khoản của tôi", () => new ProfilePage());
+
+        private void RefreshPageButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentPageFactory != null) ContentArea.Content = _currentPageFactory();
+        }
+
+        private void ShowUtilityPage(string title, Func<FrameworkElement> create)
+        {
+            PageTitleText.Text = title;
+            _currentPageFactory = create;
+            ContentArea.Content = create();
+            if (_mode == LayoutMode.Narrow) SetDrawer(false);
+        }
 
         /// <summary>Chuyển tới mục menu theo tên (dùng cho chuông thông báo và liên kết giữa các trang).</summary>
         public void NavigateTo(string title)
         {
+            if (title == Navigation.NotificationsTitle)
+            {
+                ShowUtilityPage(title, NotificationsPage.Create);
+                return;
+            }
             var target = _nav.FirstOrDefault(n => n.Item.Title == title);
             if (target.Button == null) return;
             if (target.Button.IsChecked == true) Navigate(target.Item);
@@ -137,6 +143,7 @@ namespace Project.Frontend.Views
         private void Navigate(NavItem item)
         {
             PageTitleText.Text = item.Title;
+            _currentPageFactory = item.Create;
             ContentArea.Content = item.Create();
             if (_mode == LayoutMode.Narrow) SetDrawer(false);
         }
@@ -182,7 +189,6 @@ namespace Project.Frontend.Views
         {
             Ui.SetIsCompact(Sidebar, compact);
             BrandText.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
-            foreach (var l in _sectionLabels) l.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
             BrandPanel.HorizontalAlignment = compact ? HorizontalAlignment.Center : HorizontalAlignment.Left;
             BrandPanel.Margin = compact ? new Thickness(-6, 0, -6, 0) : new Thickness(0);
             foreach (var (button, _) in _nav) ToolTipService.SetIsEnabled(button, compact);

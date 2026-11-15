@@ -189,8 +189,10 @@ namespace SportsCenter.BLL.Services
             return (created, skipped);
         }
 
+        public Task SaveSessionAsync(ClassSession input) => SaveSessionAsync(input, null);
+
         /// <summary>Thêm/sửa một ca học. Nếu đổi giờ/phòng của ca sắp tới thì báo cho thành viên.</summary>
-        public async Task SaveSessionAsync(ClassSession input)
+        public async Task SaveSessionAsync(ClassSession input, int? coachId)
         {
             Authorization.Require(UserRole.Manager);
             if (input.EndTime <= input.StartTime) throw new ValidationException("Giờ kết thúc phải sau giờ bắt đầu.", "End");
@@ -211,6 +213,20 @@ namespace SportsCenter.BLL.Services
             session.EndTime = input.EndTime;
             session.Note = input.Note.Trim();
             if (input.Id != 0) session.Status = input.Status;
+
+            if (coachId is > 0)
+            {
+                var cls = await _db.Classes.Include(c => c.Sport).FirstAsync(c => c.Id == session.ClassId);
+                var coach = await _db.Coaches.Include(c => c.User).FirstOrDefaultAsync(c => c.Id == coachId.Value && c.IsAvailable && c.User!.IsActive);
+                if (coach == null) throw new ValidationException("Huấn luyện viên không còn khả dụng.", "Coach");
+                if (!coach.Specialty.Contains(cls.Sport!.Name, StringComparison.CurrentCultureIgnoreCase))
+                    throw new ValidationException("Huấn luyện viên không thuộc bộ môn đã chọn.", "Coach");
+                if (cls.CoachId != coach.Id)
+                {
+                    cls.CoachId = coach.Id;
+                    _notify.Queue(new[] { coach.UserId }, $"Phân công lớp: {cls.Name}", $"Bạn được phân công phụ trách lớp {cls.Name}.", NotificationType.General);
+                }
+            }
 
             if (changed && session.StartTime > DateTime.Now)
             {

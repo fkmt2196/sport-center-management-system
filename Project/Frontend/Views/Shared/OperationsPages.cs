@@ -28,19 +28,6 @@ namespace Project.Frontend.Views.Shared
         public bool IsActive => Entity.Status == EnrollmentStatus.Active;
     }
 
-    public class SupportRow
-    {
-        public required SupportRequest Entity { get; init; }
-        public string Subject => Entity.Subject;
-        public string Description => Entity.Description;
-        public string MemberName => Entity.Member?.User?.FullName ?? "Khách vãng lai";
-        public string CreatedBy => Entity.CreatedBy?.FullName ?? "";
-        public DateTime CreatedAt => Entity.CreatedAt;
-        public string CreatedText => Entity.CreatedAt.ToString("dd/MM/yyyy HH:mm");
-        public string Status => Entity.Status.ToString();
-        public string Response => Entity.Response;
-    }
-
     /// <summary>Trang vận hành dùng chung cho Quản lý và Lễ tân.</summary>
     public static class OperationsPages
     {
@@ -235,31 +222,6 @@ namespace Project.Frontend.Views.Shared
                 },
             });
         }
-
-        // ------------------------------------------------------------------ YÊU CẦU HỖ TRỢ
-        public static FrameworkElement Support() => new TablePage<SupportRow>(new TableSpec<SupportRow>
-        {
-            Title = "Yêu cầu hỗ trợ",
-            Unit = "yêu cầu",
-            EmptyIcon = Icons.Info,
-            Load = async () => (await ServiceScope.Run(s => s.Support.ListAsync())).Select(x => new SupportRow { Entity = x }).ToList(),
-            Search = r => $"{r.Subject} {r.Description} {r.MemberName}",
-            SearchPlaceholder = "Tìm theo tiêu đề, nội dung, thành viên...",
-            DefaultSort = nameof(SupportRow.CreatedAt),
-            SortDirection = System.ComponentModel.ListSortDirection.Descending,
-            Columns =
-            {
-                new Col("Yêu cầu", nameof(SupportRow.Subject), ColKind.TwoLine) { Path2 = nameof(SupportRow.Description), Bold = true, Width = Col.Star(2.5), MinWidth = 220 },
-                new Col("Thành viên", nameof(SupportRow.MemberName)) { Width = Col.Star(1.2), MinWidth = 130, HideBelow = 760 },
-                new Col("Người ghi nhận", nameof(SupportRow.CreatedBy)) { Width = Col.Star(1), MinWidth = 120, HideBelow = 1000 },
-                new Col("Thời gian", nameof(SupportRow.CreatedText)) { SortPath = nameof(SupportRow.CreatedAt), Width = Col.Px(140), HideBelow = 640 },
-                new Col("Trạng thái", nameof(SupportRow.Status), ColKind.Badge) { BadgeKind = "support" },
-            },
-            Filters = { new Filter<SupportRow>("Mọi trạng thái", (r, v) => r.Status == v!.ToString()) { Options = Rules.Enum<SupportStatus>("support"), Width = 160 } },
-            Actions = { new("Ghi nhận yêu cầu", Icons.Add, () => SalesForms.SupportAsync(null)) },
-            RowActions = { new RowAction<SupportRow>(Icons.Edit, "Xử lý / cập nhật", r => SalesForms.SupportAsync(r.Entity)) },
-            Open = r => SalesForms.SupportAsync(r.Entity),
-        });
     }
 
     /// <summary>In hoặc xuất hóa đơn (HTML dùng chung từ PaymentService.InvoiceHtml).</summary>

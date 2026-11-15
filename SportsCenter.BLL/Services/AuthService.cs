@@ -49,19 +49,14 @@ namespace SportsCenter.BLL.Services
 
             user.LastLogin = DateTime.Now;
             AppSession.SignIn(user);
-            _db.AuditLogs.Add(new AuditLog { UserId = user.Id, Username = user.Username, Action = "Đăng nhập", EntityName = nameof(User), EntityId = user.Id.ToString(), Details = $"Vai trò: {user.Role}" });
             await _db.SaveChangesAsync();
             return user;
         }
 
-        public async Task LogoutAsync()
+        public Task LogoutAsync()
         {
-            if (AppSession.UserId is int id)
-            {
-                _db.AuditLogs.Add(new AuditLog { UserId = id, Username = AppSession.Username, Action = "Đăng xuất", EntityName = nameof(User), EntityId = id.ToString() });
-                await _db.SaveChangesAsync();
-            }
             AppSession.SignOut();
+            return Task.CompletedTask;
         }
 
         /// <summary>Thành viên tự đăng ký tài khoản (vai trò Member).</summary>

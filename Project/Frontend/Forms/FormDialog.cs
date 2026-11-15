@@ -26,6 +26,7 @@ namespace Project.Frontend.Forms
         public int? MaxLength { get; init; }
         public object? Value { get; init; }
         public IEnumerable<(string Text, object Value)>? Options { get; init; }
+        public bool Searchable { get; init; }
         /// <summary>Kiểm tra riêng của trường; trả về thông báo lỗi hoặc null.</summary>
         public Func<FormDialog, object?, string?>? Validate { get; init; }
         /// <summary>Gọi khi giá trị thay đổi (vd. combobox phụ thuộc nhau).</summary>
@@ -185,9 +186,24 @@ namespace Project.Frontend.Forms
                     input = dp;
                     break;
                 case FieldKind.Combo:
-                    var cb = new ComboBox { IsEnabled = !f.ReadOnly };
+                    var cb = new ComboBox { IsEnabled = !f.ReadOnly, IsEditable = f.Searchable, IsTextSearchEnabled = !f.Searchable, StaysOpenOnEdit = f.Searchable, ToolTip = f.Placeholder };
                     FillCombo(cb, f.Options, f.Value);
                     cb.SelectionChanged += (_, _) => Changed(f.Key);
+                    if (f.Searchable)
+                    {
+                        var allOptions = (f.Options ?? Enumerable.Empty<(string Text, object Value)>()).ToList();
+                        cb.PreviewKeyUp += (_, _) =>
+                        {
+                            var query = cb.Text.Trim();
+                            var matches = string.IsNullOrEmpty(query) ? allOptions : allOptions.Where(o => o.Text.Contains(query, StringComparison.CurrentCultureIgnoreCase)).ToList();
+                            var typed = cb.Text;
+                            cb.Items.Clear();
+                            foreach (var (text, value) in matches) cb.Items.Add(new ComboBoxItem { Content = text, Tag = value });
+                            cb.SelectedItem = null;
+                            cb.Text = typed;
+                            cb.IsDropDownOpen = true;
+                        };
+                    }
                     input = cb;
                     break;
                 case FieldKind.MultiCheck:

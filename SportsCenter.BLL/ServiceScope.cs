@@ -26,9 +26,6 @@ namespace SportsCenter.BLL
         public ReportService Reports => new(_db);
         public TrainingService Training => new(_db);
         public NotificationService Notifications => new(_db);
-        public SupportService Support => new(_db);
-        public AuditService Audit => new(_db);
-        public AiContextService AiContext => new(_db);
 
         /// <summary>Chạy một thao tác với scope mới.</summary>
         public static async Task<T> Run<T>(Func<ServiceScope, Task<T>> work)

@@ -5,7 +5,6 @@ using Project.Frontend.Data;
 using Project.Frontend.Forms;
 using Project.Frontend.Shell;
 using Project.Frontend.Views.Shared;
-using SportsCenter.BLL.AI;
 using SportsCenter.DAL.Models;
 
 namespace Project.Frontend.Views.Coaching
@@ -97,7 +96,6 @@ namespace Project.Frontend.Views.Coaching
             RowActions =
             {
                 new RowAction<MyMemberRow>("", "Hồ sơ & tiến độ", r => MemberProgressAsync(r.Id, r.FullName)),
-                new RowAction<MyMemberRow>("", "AI gợi ý bài tập", r => AiSuggestAsync(r.Id)),
                 new RowAction<MyMemberRow>(Icons.Edit, "Tạo kế hoạch tập", r => TrainingForms.PlanAsync(CoachId, null, r.Id, goal: r.Goals)),
                 new RowAction<MyMemberRow>(Icons.Checklist, "Ghi kết quả tập", r => TrainingForms.LogAsync(CoachId, null, r.Id)),
                 new RowAction<MyMemberRow>(Icons.Success, "Đánh giá tiến độ", r => TrainingForms.ReviewAsync(CoachId, null, r.Id)),
@@ -127,27 +125,8 @@ namespace Project.Frontend.Views.Coaching
                 new InfoSection("Kết quả tập gần đây", logs.Take(5).Select(l => (l.Date.ToString("dd/MM/yyyy"), $"{l.Exercises}{(l.WeightKg.HasValue ? $" · {l.WeightKg:0.#} kg" : "")}{(l.Notes.Length > 0 ? $" · {l.Notes}" : "")}"))
                     .DefaultIfEmpty(("—", "Chưa có kết quả")).ToList()),
                 new InfoSection("Đánh giá tiến độ", reviews.Take(4).Select(r => ($"{r.Date:dd/MM/yyyy} · {r.Score}/10", r.Comment)).DefaultIfEmpty(("—", "Chưa có đánh giá")).ToList()),
-            }, ("AI gợi ý bài tập", "", async () => { await AiSuggestAsync(memberId); return false; }));
+            });
             return false;
-        }
-
-        /// <summary>Gọi trợ lý AI gợi ý bài tập cho học viên; có thể lưu ngay thành kế hoạch tập.</summary>
-        public static async Task<bool> AiSuggestAsync(int memberId)
-        {
-            var ai = AiAssistantFactory.Create();
-            var profile = await ServiceScope.Run(s => s.AiContext.BuildProfileAsync(memberId));
-            UiHost.Toast($"Đang tạo gợi ý cho {profile.Name}...", ToastKind.Info);
-            var suggestion = await ai.SuggestWorkoutAsync(profile, null);
-            var saved = false;
-            await InfoDialog.ShowAsync($"Gợi ý bài tập – {profile.Name}", ai.ProviderName, "",
-                new[] { new InfoSection($"Mục tiêu: {profile.Goals}", Body: suggestion) },
-                ("Lưu thành kế hoạch tập", Icons.Edit, async () =>
-                {
-                    UiHost.CloseDialog(false);
-                    saved = await TrainingForms.PlanAsync(CoachId, null, memberId, suggestion, profile.Goals);
-                    return false;
-                }));
-            return saved;
         }
 
         // ------------------------------------------------------------------ KẾ HOẠCH TẬP

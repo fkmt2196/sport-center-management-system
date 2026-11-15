@@ -13,13 +13,15 @@ namespace Project.Frontend.Data
         /// <summary>Trạng thái gói của thành viên: Active / Expiring (≤7 ngày) / Expired / None.</summary>
         public static (string State, DateTime? End, string PlanName) Membership(Member m)
         {
-            var end = MemberService.MembershipEnd(m);
             var current = MemberService.CurrentSubscription(m);
-            var latest = m.Subscriptions.Where(s => s.Status == SubscriptionStatus.Active).OrderByDescending(s => s.EndDate).FirstOrDefault();
-            var plan = (current ?? latest)?.Plan?.Name ?? "";
-            if (end == null) return ("None", null, plan);
-            if (current == null) return end < DateTime.Today ? ("Expired", end, plan) : ("Upcoming", end, plan);
-            return (end.Value.Date <= DateTime.Today.AddDays(7) ? "Expiring" : "Active", end, plan);
+            var active = m.Subscriptions.Where(s => s.Status == SubscriptionStatus.Active).ToList();
+            var upcoming = active.Where(s => s.StartDate.Date > DateTime.Today).OrderBy(s => s.StartDate).FirstOrDefault();
+            var latest = active.OrderByDescending(s => s.EndDate).FirstOrDefault();
+            var selected = current ?? upcoming ?? latest;
+            if (selected == null) return ("None", null, "");
+            if (current == null)
+                return upcoming != null ? ("Upcoming", upcoming.EndDate, upcoming.Plan?.Name ?? "") : ("Expired", latest!.EndDate, latest.Plan?.Name ?? "");
+            return (current.EndDate.Date <= DateTime.Today.AddDays(7) ? "Expiring" : "Active", current.EndDate, selected.Plan?.Name ?? "");
         }
 
         public static string Age(DateTime? dob) => dob is DateTime d ? $"{DateTime.Today.Year - d.Year - (DateTime.Today.DayOfYear < d.DayOfYear ? 1 : 0)} tuổi" : "";

@@ -3,7 +3,7 @@ using SportsCenter.DAL.Models;
 namespace SportsCenter.DAL.Data
 {
     /// <summary>
-    /// Người dùng đang đăng nhập (dùng chung cho kiểm tra quyền và ghi audit log).
+    /// Người dùng đang đăng nhập, dùng chung cho kiểm tra quyền.
     /// Ứng dụng desktop chỉ có một phiên tại một thời điểm nên dùng trạng thái tĩnh.
     /// </summary>
     public static class AppSession

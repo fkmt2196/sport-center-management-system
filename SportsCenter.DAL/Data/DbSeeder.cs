@@ -45,7 +45,6 @@ namespace SportsCenter.DAL.Data
         public static void Seed(SportsCenterContext db, Func<string, string> hashPassword)
         {
             if (db.Users.Any()) return;
-            db.AuditEnabled = false;
             db.ChangeTracker.AutoDetectChangesEnabled = false;
 
             var today = DateTime.Today;
@@ -432,43 +431,9 @@ namespace SportsCenter.DAL.Data
             }
             db.Notifications.AddRange(notifications);
 
-            // ---------------- Yêu cầu hỗ trợ ----------------
-            var supportSubjects = new (string Subject, string Desc, SupportStatus Status, string Response)[]
-            {
-                ("Mất thẻ thành viên", "Thành viên làm mất thẻ, cần cấp lại.", SupportStatus.Resolved, "Đã cấp thẻ mới, phí 50.000 ₫."),
-                ("Tủ đồ số 12 bị kẹt khóa", "Không mở được tủ sau buổi tập tối.", SupportStatus.Resolved, "Kỹ thuật đã thay ổ khóa."),
-                ("Xin bảo lưu gói 1 tháng", "Đi công tác nước ngoài 3 tuần, xin bảo lưu.", SupportStatus.InProgress, "Đang chờ quản lý duyệt."),
-                ("Máy chạy số 3 phát tiếng kêu", "Máy chạy bộ số 3 kêu to khi chạy trên 10 km/h.", SupportStatus.Open, ""),
-                ("Đổi lớp Yoga sang buổi sáng", "Muốn chuyển từ Yoga cơ bản buổi tối sang lớp buổi sáng.", SupportStatus.Open, ""),
-                ("Xuất hóa đơn VAT công ty", "Cần hóa đơn VAT cho gói 12 tháng.", SupportStatus.Resolved, "Đã gửi hóa đơn điện tử qua email."),
-                ("Nước hồ bơi hơi lạnh", "Phản ánh nước hồ bơi buổi sáng lạnh.", SupportStatus.InProgress, "Đã báo bộ phận kỹ thuật kiểm tra máy gia nhiệt."),
-                ("Đăng ký PT 1-1", "Muốn thuê PT riêng 12 buổi để giảm cân.", SupportStatus.Open, ""),
-            };
-            foreach (var (s, i) in supportSubjects.Select((s, i) => (s, i)))
-            {
-                var created = now.AddDays(-Rng.Next(0, 40)).AddHours(-Rng.Next(0, 8));
-                db.SupportRequests.Add(new SupportRequest
-                {
-                    MemberId = members[Rng.Next(members.Count)].Id, CreatedByUserId = i % 3 == 0 ? reception2.Id : reception1.Id,
-                    Subject = s.Subject, Description = s.Desc, Status = s.Status, Response = s.Response, CreatedAt = created,
-                    ResolvedAt = s.Status == SupportStatus.Resolved ? created.AddHours(Rng.Next(2, 48)) : null
-                });
-            }
-
-            // ---------------- Audit log mẫu ----------------
-            var staff = new[] { manager, reception1, reception2 }.Concat(coaches.Select(c => c.User!)).ToList();
-            for (int i = 0; i < 40; i++)
-            {
-                var u = staff[Rng.Next(staff.Count)];
-                var at = now.AddDays(-Rng.Next(0, 14)).AddMinutes(-Rng.Next(0, 600));
-                db.AuditLogs.Add(new AuditLog { UserId = u.Id, Username = u.Username, Action = "Đăng nhập", EntityName = nameof(User), EntityId = u.Id.ToString(), Details = $"Vai trò: {u.Role}", Timestamp = at });
-            }
-            db.AuditLogs.Add(new AuditLog { UserId = manager.Id, Username = manager.Username, Action = "Cập nhật", EntityName = nameof(MembershipPlan), EntityId = plans[6].Id.ToString(), Details = "Gói Hè 2026 | IsActive: True → False", Timestamp = now.AddDays(-75) });
-
             db.ChangeTracker.DetectChanges();
             db.SaveChanges();
             db.ChangeTracker.AutoDetectChangesEnabled = true;
-            db.AuditEnabled = true;
         }
 
         private const string CenterName = "FitZone Sports Center";

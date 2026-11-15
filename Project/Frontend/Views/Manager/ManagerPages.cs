@@ -294,27 +294,6 @@ namespace Project.Frontend.Views.Manager
         public string Active => Entity.IsActive.ToString();
     }
 
-    public class AuditRow
-    {
-        public required AuditLog Entity { get; init; }
-        public DateTime Timestamp => Entity.Timestamp;
-        public string TimeText => Entity.Timestamp.ToString("dd/MM/yyyy HH:mm:ss");
-        public string Username => Entity.Username;
-        public string Action => Entity.Action;
-        public string EntityName => Names.GetValueOrDefault(Entity.EntityName, Entity.EntityName);
-        public string Target => $"{EntityName} #{Entity.EntityId}";
-        public string Details => Entity.Details;
-
-        private static readonly Dictionary<string, string> Names = new()
-        {
-            ["User"] = "Tài khoản", ["Member"] = "Thành viên", ["Coach"] = "Huấn luyện viên", ["Sport"] = "Bộ môn", ["Room"] = "Phòng tập",
-            ["TrainingClass"] = "Lớp học", ["ClassSession"] = "Ca học", ["Enrollment"] = "Đăng ký lớp", ["Attendance"] = "Điểm danh",
-            ["CheckIn"] = "Check-in", ["MembershipPlan"] = "Gói thành viên", ["Subscription"] = "Đăng ký gói", ["Payment"] = "Thanh toán",
-            ["TrainingPlan"] = "Kế hoạch tập", ["WorkoutLog"] = "Kết quả tập", ["ProgressReview"] = "Đánh giá", ["Notification"] = "Thông báo",
-            ["SupportRequest"] = "Hỗ trợ",
-        };
-    }
-
     public static class ManagerPages
     {
         public static FrameworkElement Coaches() => new TablePage<CoachRowM>(new TableSpec<CoachRowM>
@@ -664,41 +643,5 @@ namespace Project.Frontend.Views.Manager
             Open = r => CatalogForms.PlanAsync(r.Entity),
         });
 
-        public static FrameworkElement Audit()
-        {
-            var today = DateTime.Today;
-            return new TablePage<AuditRow>(new TableSpec<AuditRow>
-            {
-                Title = "Nhật ký thao tác",
-                Subtitle = "Ghi tự động mọi thay đổi dữ liệu và đăng nhập/đăng xuất (90 ngày gần nhất)",
-                Unit = "thao tác",
-                EmptyIcon = "",
-                Load = async () => (await ServiceScope.Run(s => s.Audit.ListAsync(today.AddDays(-90), today.AddDays(1)))).Select(a => new AuditRow { Entity = a }).ToList(),
-                Search = r => $"{r.Username} {r.Action} {r.EntityName} {r.Details}",
-                SearchPlaceholder = "Tìm theo người dùng, hành động, nội dung...",
-                DefaultSort = nameof(AuditRow.Timestamp),
-                SortDirection = System.ComponentModel.ListSortDirection.Descending,
-                Columns =
-                {
-                    new Col("Thời gian", nameof(AuditRow.TimeText)) { SortPath = nameof(AuditRow.Timestamp), Width = Col.Px(160) },
-                    new Col("Người dùng", nameof(AuditRow.Username)) { Width = Col.Px(120) },
-                    new Col("Hành động", nameof(AuditRow.Action)) { Width = Col.Px(110), Bold = true },
-                    new Col("Đối tượng", nameof(AuditRow.Target)) { SortPath = nameof(AuditRow.EntityName), Width = Col.Px(170), HideBelow = 700 },
-                    new Col("Chi tiết", nameof(AuditRow.Details)) { Width = Col.Star(3), MinWidth = 200, HideBelow = 900 },
-                },
-                Filters =
-                {
-                    new Filter<AuditRow>("90 ngày", (r, v) => r.Timestamp >= today.AddDays(-(int)v! + 1)) { Options = new[] { ("Hôm nay", (object)1), ("7 ngày", 7), ("30 ngày", 30) }, Width = 120 },
-                    new Filter<AuditRow>("Mọi hành động", (r, v) => r.Action == (string)v!) { OptionsFrom = rows => rows.Select(r => r.Action).Distinct().OrderBy(x => x).Select(x => (x, (object)x)), Width = 150 },
-                    new Filter<AuditRow>("Mọi đối tượng", (r, v) => r.EntityName == (string)v!) { OptionsFrom = rows => rows.Select(r => r.EntityName).Distinct().OrderBy(x => x).Select(x => (x, (object)x)), Width = 160 },
-                    new Filter<AuditRow>("Mọi người dùng", (r, v) => r.Username == (string)v!) { OptionsFrom = rows => rows.Select(r => r.Username).Distinct().OrderBy(x => x).Select(x => (x, (object)x)), Width = 150 },
-                },
-                Open = async r =>
-                {
-                    await InfoDialog.ShowAsync($"{r.Action} – {r.Target}", $"{r.Username} · {r.TimeText}", "", new[] { new InfoSection("Chi tiết", Body: r.Details) });
-                    return false;
-                },
-            });
-        }
     }
 }
